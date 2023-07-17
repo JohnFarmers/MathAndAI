@@ -63,7 +63,6 @@ namespace JohnFarmer.NeuralNetwork
                 Matrix weight = weights[l - 1].Transpose();
                 Matrix error = Matrix.HadamardProduct(weight * errors[layers.Length - 1 - l], Matrix.Map(l - 2 < 0 ? matrixInputs : activations[l - 2], activationFunctionDerivative));
                 errors.Add(error);
-                weights[l - 1] -= error * learningRate;
             }
             for (int l = layers.Length; l > 0; l--)
             {
