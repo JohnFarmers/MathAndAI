@@ -14,10 +14,11 @@ namespace TestingConsole
 			{ new double[] { 0, 0 }, new double[] { 0 } }
 		};
 
-		private static readonly NeuralNetwork neuralNetwork = new NeuralNetwork(new int[] { 2, 2, 1 }, ActivationFunction.Sigmoid, ActivationFunction.SigmoidPrime, CostFunction.CrossEntropyLoss, .1);
+		private static readonly NeuralNetwork neuralNetwork = new NeuralNetwork(new int[] { 2, 2, 1 }, ActivationFunction.Sigmoid, ActivationFunction.SigmoidPrime, CostFunction.CrossEntropyLoss, .1, .1);
 
 		private static void Main(string[] args)
 		{
+			Console.WriteLine("Pre-train:");
 			foreach (double[] input in trainingDatas.Keys)
 			{
 				string outputs = "[";
@@ -25,11 +26,13 @@ namespace TestingConsole
 					outputs += d + ",";
 				Console.WriteLine(input + ": " + outputs.Remove(outputs.Length - 1) + "]");
 			}
+			Console.WriteLine("\n");
 			TestNeuralNetwork();
 		}
 
 		public static void TestNeuralNetwork()
 		{
+			Console.WriteLine("Post-train:");
 			for (int i = 0; i < 1000; i++)
 				foreach (double[] input in trainingDatas.Keys)
 					neuralNetwork.Train(input, trainingDatas[input]);
@@ -40,6 +43,7 @@ namespace TestingConsole
 					outputs += d + ",";
 				Console.WriteLine(input + ": " + outputs.Remove(outputs.Length - 1) + "]");
 			}
+			Console.WriteLine(neuralNetwork.accuracy + "%");
 		}
 	}
 }
