@@ -8,13 +8,25 @@ namespace JohnFarmer.NeuralNetwork
     {
         public readonly int[] layers;
         public List<Matrix> weights, biases;
-        public Func<double, double> activationFunction = ActivationFunction.Sigmoid, activationFunctionDerivative = ActivationFunction.SigmoidPrime;
-        public Func<double, double, double> costFunction = CostFunction.CrossEntropyLoss;
+        public Func<double, double> activationFunction, activationFunctionDerivative;
+        public Func<double, double, double> costFunction;
         public double learningRate = .1;
 
-        public NeuralNetwork(params int[] layers)
+		/// <summary>
+		/// Initialize the neural network with number of node in each layer, activation function, activation function derivative, cost function and learning rate.
+		/// </summary>
+		/// <param name="layers">The number of node in each layer.</param>
+		/// <param name="activationFunction">A function that decides whether a neuron should be activated or not.</param>
+		/// <param name="activationFunctionDerivative">The derivative of the activation function.</param>
+		/// <param name="costFunction">A function that used to estimate how badly neural network are performing.</param>
+		/// <param name="learningRate">Determine how fast the neural network will adjust it's parameters in each iteration of training.</param>
+		public NeuralNetwork(int[] layers, Func<double, double> activationFunction, Func<double, double> activationFunctionDerivative, Func<double, double, double> costFunction, double learningRate)
         {
             this.layers = layers;
+            this.activationFunction = activationFunction;
+            this.activationFunctionDerivative = activationFunctionDerivative;
+            this.costFunction = costFunction;
+            this.learningRate = learningRate;
             weights = new List<Matrix>();
             biases = new List<Matrix>();
 			for (int i = 0; i < layers.Length - 1; i++)
@@ -56,11 +68,12 @@ namespace JohnFarmer.NeuralNetwork
                 weightedSums.Add(weightedSum);
 				activations.Add(Matrix.Map(weightedSum, activationFunction));
             }
-            Matrix dcdz = activations[^1] - targetOutputs.To1DMatrix();
+            Matrix outputs = activations[^1];
+            Matrix dcdz = outputs - targetOutputs.To1DMatrix();
 			for (int l = layers.Length - 1; l > 0; l--)
 			{
                 dcdz = l == layers.Length - 1 ? dcdz : Matrix.HadamardProduct(weights[l].Transpose() * dcdz, Matrix.Map(weightedSums[l], activationFunctionDerivative));
-                weights[l - 1] -= (dcdz * activations[l - 1].Transpose()) * learningRate;
+                weights[l - 1] -= dcdz * activations[l - 1].Transpose() * learningRate;
                 biases[l - 1] -= dcdz * learningRate;
             }
         }

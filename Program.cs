@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using JohnFarmer.Mathematics;
 using JohnFarmer.NeuralNetwork;
 
 namespace TestingConsole
@@ -15,7 +14,7 @@ namespace TestingConsole
 			{ new double[] { 0, 0 }, new double[] { 0 } }
 		};
 
-		private static readonly NeuralNetwork neuralNetwork = new NeuralNetwork(2, 3, 2, 1);
+		private static readonly NeuralNetwork neuralNetwork = new NeuralNetwork(new int[] { 2, 2, 1 }, ActivationFunction.Sigmoid, ActivationFunction.SigmoidPrime, CostFunction.CrossEntropyLoss, .1);
 
 		private static void Main(string[] args)
 		{
@@ -31,7 +30,7 @@ namespace TestingConsole
 
 		public static void TestNeuralNetwork()
 		{
-			for (int i = 0; i < 10000; i++)
+			for (int i = 0; i < 1000; i++)
 				foreach (double[] input in trainingDatas.Keys)
 					neuralNetwork.Train(input, trainingDatas[input]);
 			foreach (double[] input in trainingDatas.Keys)
@@ -41,16 +40,6 @@ namespace TestingConsole
 					outputs += d + ",";
 				Console.WriteLine(input + ": " + outputs.Remove(outputs.Length - 1) + "]");
 			}
-		}
-
-		public static void Matrix(int rows, int columns) => Console.WriteLine(new Matrix(rows, columns).Randomize());
-
-		public static void TransposeMatrix(int rows, int columns)
-		{
-			Matrix matrix = new Matrix(rows, columns).Randomize();
-			Console.WriteLine(matrix);
-			Console.WriteLine(matrix.Transpose());
-			Console.WriteLine(matrix.Transpose().Transpose());
 		}
 	}
 }
