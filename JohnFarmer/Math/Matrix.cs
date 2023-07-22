@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace JohnFarmer.Math
+namespace JohnFarmer.Mathematics
 {
 	public struct Matrix
 	{
@@ -81,14 +81,14 @@ namespace JohnFarmer.Math
 		{
 			Matrix result = matrix;
 			for (int i = 0; i < power - 1; i++)
-				result = HadamardProduct(matrix, matrix);
+				result = HadamardProduct(result, matrix);
 			return result;
 		}
 
 		public static Matrix HadamardProduct(Matrix matrix1, Matrix matrix2)
 		{
 			if (matrix1.columns != matrix2.columns || matrix1.rows != matrix2.rows)
-				throw new Exception("Dimension of matrix1 must match dimension of matrix2.");
+				throw new Exception("The dimension of the matrix must match.");
 			Matrix result = new Matrix(matrix1.rows, matrix1.columns);
 			for (int row = 0; row < result.rows; row++)
 				for (int column = 0; column < result.columns; column++)
@@ -135,7 +135,7 @@ namespace JohnFarmer.Math
 		public static Matrix operator +(Matrix matrix1, Matrix matrix2)
 		{
 			if (matrix1.rows != matrix2.rows || matrix1.columns != matrix2.columns)
-				throw new Exception("Rows and columns of matrix1 must match rows and columns of matrix2.");
+				throw new Exception("The dimension of the matrix must match.");
 			Matrix result = new Matrix(matrix1.rows, matrix1.columns);
 			for (int row = 0; row < result.rows; row++)
 				for (int column = 0; column < result.columns; column++)
@@ -155,7 +155,7 @@ namespace JohnFarmer.Math
 		public static Matrix operator -(Matrix matrix1, Matrix matrix2)
 		{
 			if (matrix1.rows != matrix2.rows || matrix1.columns != matrix2.columns)
-				throw new Exception("Rows and columns of matrix1 must match rows and columns of matrix2.");
+				throw new Exception("The dimension of the matrix must match.");
 			Matrix result = new Matrix(matrix1.rows, matrix1.columns);
 			for (int row = 0; row < result.rows; row++)
 				for (int column = 0; column < result.columns; column++)

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using JohnFarmer.Math;
+using JohnFarmer.Mathematics;
 using JohnFarmer.NeuralNetwork;
 
 namespace TestingConsole
@@ -15,7 +15,7 @@ namespace TestingConsole
 			{ new double[] { 0, 0 }, new double[] { 0 } }
 		};
 
-		private static readonly NeuralNetwork neuralNetwork = new NeuralNetwork(2, 2, 1);
+		private static readonly NeuralNetwork neuralNetwork = new NeuralNetwork(2, 3, 2, 1);
 
 		private static void Main(string[] args)
 		{
@@ -31,7 +31,7 @@ namespace TestingConsole
 
 		public static void TestNeuralNetwork()
 		{
-			for (int i = 0; i < 1; i++)
+			for (int i = 0; i < 10000; i++)
 				foreach (double[] input in trainingDatas.Keys)
 					neuralNetwork.Train(input, trainingDatas[input]);
 			foreach (double[] input in trainingDatas.Keys)
