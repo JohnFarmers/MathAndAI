@@ -43,7 +43,7 @@ namespace TestingConsole
 					outputs += d + ",";
 				Console.WriteLine(input + ": " + outputs.Remove(outputs.Length - 1) + "]");
 			}
-			Console.WriteLine(neuralNetwork.accuracy + "%");
+			Console.WriteLine("Accuracy: " + neuralNetwork.accuracy + "%");
 		}
 	}
 }
