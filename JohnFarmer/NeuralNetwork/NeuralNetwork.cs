@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JohnFarmer.Mathematics;
 
 namespace JohnFarmer.NeuralNetwork
@@ -41,7 +42,7 @@ namespace JohnFarmer.NeuralNetwork
 		/// <summary>
 		/// Perform a forward propagation and return the predicted value.
 		/// </summary>
-		public double[] Predict(double[] inputs)
+		public virtual double[] Predict(double[] inputs)
 		{
 			Matrix prediction = new Matrix();
 			Matrix matrixInputs = inputs.To1DMatrix();
@@ -56,7 +57,7 @@ namespace JohnFarmer.NeuralNetwork
 		/// <summary>
 		/// Perform a forward propagatiom and train the neural network by performing a backpropagation.
 		/// </summary>
-		public void Train(double[] inputs, double[] targetOutputs)
+		public virtual void Train(double[] inputs, double[] targetOutputs)
 		{
 			if (targetOutputs.Length != layers[^1])
 				throw new Exception("The number of target outputs must match the number of the neural network outputs.");
@@ -78,7 +79,8 @@ namespace JohnFarmer.NeuralNetwork
 				weights[l - 1] -= dcdz * activations[l - 1].Transpose() * learningRate;
 				biases[l - 1] -= dcdz * learningRate;
 			}
-			double[] outputsArray = outputs.ToArray();
+
+			double[] outputsArray = Predict(inputs).ToArray();
 			int correctPrediction = 0;
 			for(int i = 0; i < outputsArray.Length; i++)
 				if (Math.Abs(outputsArray[i] - targetOutputs[i]) <= errorMaxRange)
