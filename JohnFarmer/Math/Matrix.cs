@@ -78,14 +78,6 @@ namespace JohnFarmer.Mathematics
 			return result;
 		}
 
-		public static Matrix Power(Matrix matrix, int power)
-		{
-			Matrix result = matrix;
-			for (int i = 0; i < power - 1; i++)
-				result = HadamardProduct(result, matrix);
-			return result;
-		}
-
 		public static Matrix HadamardProduct(Matrix matrix1, Matrix matrix2)
 		{
 			if (matrix1.columns != matrix2.columns || matrix1.rows != matrix2.rows)
