@@ -21,6 +21,21 @@ namespace JohnFarmer.Mathematics
 
 		public double this[int row, int column] { get => values[row, column]; set => values[row, column] = value; }
 
+		public Matrix this[Range rowRange, Range columnRange]
+		{
+			get {
+				int rowStart = rowRange.Start.Value;
+				int rowEnd = rowRange.End.Value;
+				int columnStart = columnRange.Start.Value;
+				int columnEnd = columnRange.End.Value;
+				Matrix result = new Matrix(rowEnd - rowStart, columnEnd - columnStart);
+				for (int row = 0; row < result.rows; row++)
+					for (int column = 0; column < result.columns; column++)
+						result[row, column] = values[row + rowStart, column + columnStart];
+				return result;
+			}
+		}
+
 		public Matrix Randomize()
 		{
 			Random random = new Random();
@@ -55,6 +70,24 @@ namespace JohnFarmer.Mathematics
 					doubles.Add(values[row, column]);
 			return doubles.ToArray();
 		}
+		
+		public double[,] To2DArray()
+		{
+			double[,] doubles = new double[rows, columns];
+			for (int row = 0; row < rows; row++)
+				for (int column = 0; column < columns; column++)
+					doubles[row, column] = values[row, column];
+			return doubles;
+		}
+
+		public double GetSum()
+		{
+			double sum = 0;
+			for (int row = 0; row < rows; row++)
+				for (int column = 0; column < columns; column++)
+					sum += values[row, column];
+			return sum;
+		}
 
 		public override string ToString()
 		{
@@ -63,7 +96,11 @@ namespace JohnFarmer.Mathematics
 			{
 				text += "\n| ";
 				for (int column = 0; column < columns; column++)
-					text += values[row, column] + " ";
+				{
+					double value = values[row, column];
+					string space = value >= 0 ? " " : "";
+					text += value.ToString($"{space}0.00") + " ";
+				}
 				text += "|";
 			}
 			return text;
