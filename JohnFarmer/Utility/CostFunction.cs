@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JohnFarmer.NeuralNetwork
+namespace MathAndAI.NeuralNetwork
 {
 	public struct CostFunction
 	{

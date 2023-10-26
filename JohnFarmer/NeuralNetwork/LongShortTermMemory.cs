@@ -1,8 +1,8 @@
-using JohnFarmer.NeuralNetwork;
+using MathAndAI.NeuralNetwork;
 using System;
 using System.Collections.Generic;
 
-namespace TestingConsole.JohnFarmer.NeuralNetwork
+namespace MathAndAI.NeuralNetwork
 {
 	public class LongShortTermMemory
 	{
@@ -62,7 +62,22 @@ namespace TestingConsole.JohnFarmer.NeuralNetwork
 
 		public void Train(double[] inputs, double[] targetOutputs)
 		{
-
+			List<double> 
+				outputs = new List<double>(),
+				forgetgates = new List<double>(),
+				inputgates = new List<double>(),
+				outputGates = new List<double>();
+			for (int i = 0; i < inputs.Length; i++)
+			{
+				double input = inputs[i];
+				double forgetGate = sigmoid((input * forgetGateWeight) + (hiddenState * forgetGateUWeight) + forgetGateBias);
+				cellState *= forgetGate;
+				double inputGate = sigmoid((input * inputGateWeight) + (hiddenState * inputGateUWeight) + inputGateBias);
+				cellState += inputGate * tanh((input * cellStateUpdateWeight) + (hiddenState * cellStateUpdateUWeight) + cellStateUpdateBias);
+				double outputGate = sigmoid((input * outputGateWeight) + (hiddenState * outputGateUWeight) + outputGateBias);
+				hiddenState = outputGate * tanh(cellState);
+				outputs.Add(hiddenState);
+			}
 		}
 	}
 }

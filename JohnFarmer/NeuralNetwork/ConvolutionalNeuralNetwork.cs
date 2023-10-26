@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using JohnFarmer.Mathematics;
+using MathAndAI.Mathematics;
 
-namespace JohnFarmer.NeuralNetwork
+namespace MathAndAI.NeuralNetwork
 {
 	public class ConvolutionalNeuralNetwork : NeuralNetwork
 	{

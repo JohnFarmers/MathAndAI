@@ -4,9 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="TestingConsole\**" />
-    <EmbeddedResource Remove="TestingConsole\**" />
-    <None Remove="TestingConsole\**" />
+    <Compile Remove="MathAndAI\**" />
+    <EmbeddedResource Remove="MathAndAI\**" />
+    <None Remove="MathAndAI\**" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />

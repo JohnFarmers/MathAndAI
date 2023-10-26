@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace JohnFarmer.NeuralNetwork
+namespace MathAndAI.NeuralNetwork
 {
 	public class RecurrentNeuralNetowrk
 	{

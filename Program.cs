@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using JohnFarmer.NeuralNetwork;
+using MathAndAI.NeuralNetwork;
 using System.Linq;
-using JohnFarmer.Mathematics;
+using MathAndAI.Mathematics;
 
-namespace TestingConsole
+namespace MathAndAI
 {
 	public class Program
 	{
