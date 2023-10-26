@@ -1,12 +1,15 @@
+using CommunityToolkit.HighPerformance;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace MathAndAI.Mathematics
 {
 	public struct Matrix
 	{
 		public readonly int rows, columns;
-		private readonly double[,] values;
+		public readonly double[,] values;
 
 		public Matrix(int rows, int columns)
 		{
@@ -138,14 +141,40 @@ namespace MathAndAI.Mathematics
 		{
 			if (matrix1.columns != matrix2.rows)
 				throw new Exception("Columns of matrix1 must match rows of matrix2.");
+
 			Matrix product = new Matrix(matrix1.rows, matrix2.columns);
+
+			bool useUnsafe = matrix1.rows * matrix1.columns <= 300;
+			var matrix1Span = matrix1.values.AsSpan2D();
+			var matrix2Span = useUnsafe ? matrix2.Transpose().values.AsSpan2D() : matrix2.values.AsSpan2D();
+
 			for (int row = 0; row < product.rows; row++)
 			{
 				for (int column = 0; column < product.columns; column++)
 				{
 					double sum = 0;
-					for (int i = 0; i < matrix1.columns; i++)
-						sum += matrix1[row, i] * matrix2[i, column];
+					if (matrix1.rows * matrix1.columns <= 300)
+					{
+						Span<double> span1 = matrix1Span.GetRowSpan(row);
+						ref var start1 = ref MemoryMarshal.GetReference(span1);
+						ref var end1 = ref Unsafe.Add(ref start1, span1.Length);
+
+						Span<double> span2 = matrix2Span.GetRowSpan(column);
+						ref var start2 = ref MemoryMarshal.GetReference(span2);
+						ref var end2 = ref Unsafe.Add(ref start2, span2.Length);
+
+						while (Unsafe.IsAddressLessThan(ref start1, ref end1) && Unsafe.IsAddressLessThan(ref start2, ref end2))
+						{
+							sum += start1 * start2;
+							start1 = ref Unsafe.Add(ref start1, 1);
+							start2 = ref Unsafe.Add(ref start2, 1);
+						}
+					}
+					else
+					{
+						for (int i = 0; i < matrix1.columns; i++)
+							sum += matrix1Span[row, i] * matrix2Span[i, column];
+					}
 					product[row, column] = sum;
 				}
 			}
