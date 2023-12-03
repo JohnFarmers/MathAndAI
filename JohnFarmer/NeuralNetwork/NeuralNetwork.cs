@@ -1,41 +1,53 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MathAndAI.Mathematics;
+using JohnFarmer.Mathematics;
 
-namespace MathAndAI.NeuralNetwork
+namespace JohnFarmer.NeuralNetwork
 {
 	public class NeuralNetwork
 	{
-		public readonly int[] layers;
+		public readonly int[] layerNodes;
 		public List<Matrix> weights, biases;
 		public Func<double, double> activationFunction, activationFunctionDerivative;
 		public Func<double, double, double> costFunction;
 		public double learningRate, errorMaxRange, accuracy = 0;
 
 		/// <summary>
-		/// Initialize the neural network with number of node in each layer, activation function, activation function derivative, cost function and learning rate.
+		/// Initialize the neural network variables.
 		/// </summary>
-		/// <param name="layers">The number of node in each layer.</param>
+		/// <param name="layerNodes">The number of node in each layer.</param>
 		/// <param name="activationFunction">A function that decides whether a neuron should be activated or not.</param>
 		/// <param name="activationFunctionDerivative">The derivative of the activation function.</param>
 		/// <param name="costFunction">A function that used to estimate how badly neural network are performing.</param>
 		/// <param name="learningRate">Determine how fast the neural network will adjust it's parameters in each iteration of training.</param>
 		/// <param name="errorMaxRange">The maximum difference between the outputs and target outputs can have to be consider correct.</param>
-		public NeuralNetwork(int[] layers, Func<double, double> activationFunction, Func<double, double> activationFunctionDerivative, Func<double, double, double> costFunction, double learningRate = .1, double errorMaxRange = .1)
+		public NeuralNetwork(int[] layerNodes, Func<double, double> activationFunction, Func<double, double> activationFunctionDerivative, Func<double, double, double> costFunction, double learningRate = .1, double errorMaxRange = .1)
 		{
-			this.layers = layers;
+			if (layerNodes.Length < 2)
+				throw new Exception("Neural Network must have atleast 2 layers");
+			this.layerNodes = layerNodes;
 			this.activationFunction = activationFunction;
 			this.activationFunctionDerivative = activationFunctionDerivative;
 			this.costFunction = costFunction;
 			this.learningRate = learningRate;
 			this.errorMaxRange = errorMaxRange;
-			weights = new List<Matrix>();
-			biases = new List<Matrix>();
-			for (int i = 0; i < layers.Length - 1; i++)
+			Initialize();
+		}
+
+		/// <summary>
+		/// Initialize or reset the neural network with specified number of node in each layer.
+		/// </summary>
+		/// <param name="weights">A parameter for when you want to specify the weights by yourself.</param>
+		/// <param name="biases">A parameter for when you want to specify the biases by yourself.</param>
+		public virtual void Initialize(Matrix[] weights = null, Matrix[] biases = null)
+		{
+			this.weights = new List<Matrix>();
+			this.biases = new List<Matrix>();
+			for (int i = 0; i < layerNodes.Length - 1; i++)
 			{
-				weights.Add(new Matrix(layers[i + 1], layers[i]).Randomize());
-				biases.Add(new Matrix(layers[i + 1], 1).Randomize());
+				this.weights.Add(weights == null ? new Matrix(layerNodes[i + 1], layerNodes[i]).Randomize() : weights[i]);
+				this.biases.Add(biases == null ? new Matrix(layerNodes[i + 1], 1).Randomize() : biases[i]);
 			}
 		}
 
@@ -46,7 +58,7 @@ namespace MathAndAI.NeuralNetwork
 		{
 			Matrix prediction = new Matrix();
 			Matrix matrixInputs = inputs.To1DMatrix();
-			for (int i = 0; i < layers.Length - 1; i++)
+			for (int i = 0; i < layerNodes.Length - 1; i++)
 			{
 				prediction = (weights[i] * (i == 0 ? matrixInputs : prediction)) + biases[i];
 				prediction.Map(activationFunction);
@@ -59,13 +71,13 @@ namespace MathAndAI.NeuralNetwork
 		/// </summary>
 		public virtual void Train(double[] inputs, double[] targetOutputs)
 		{
-			if (targetOutputs.Length != layers[^1])
+			if (targetOutputs.Length != layerNodes[^1])
 				throw new Exception("The number of target outputs must match the number of the neural network outputs.");
 			List<Matrix> activations = new List<Matrix>(), weightedSums = new List<Matrix>();
 			Matrix matrixInputs = inputs.To1DMatrix();
 			activations.Add(matrixInputs);
 			weightedSums.Add(matrixInputs);
-			for (int i = 0; i < layers.Length - 1; i++)
+			for (int i = 0; i < layerNodes.Length - 1; i++)
 			{
 				Matrix weightedSum = (weights[i] * (i == 0 ? matrixInputs : activations[i])) + biases[i];
 				weightedSums.Add(weightedSum);
@@ -73,9 +85,9 @@ namespace MathAndAI.NeuralNetwork
 			}
 			Matrix outputs = activations[^1];
 			Matrix dcdz = outputs - targetOutputs.To1DMatrix();
-			for (int l = layers.Length - 1; l > 0; l--)
+			for (int l = layerNodes.Length - 1; l > 0; l--)
 			{
-				dcdz = l == layers.Length - 1 ? dcdz : Matrix.HadamardProduct(weights[l].Transpose() * dcdz, Matrix.Map(weightedSums[l], activationFunctionDerivative));
+				dcdz = l == layerNodes.Length - 1 ? dcdz : Matrix.HadamardProduct(weights[l].Transpose() * dcdz, Matrix.Map(weightedSums[l], activationFunctionDerivative));
 				weights[l - 1] -= dcdz * activations[l - 1].Transpose() * learningRate;
 				biases[l - 1] -= dcdz * learningRate;
 			}

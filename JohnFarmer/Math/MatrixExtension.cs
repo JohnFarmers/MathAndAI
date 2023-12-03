@@ -1,4 +1,4 @@
-namespace MathAndAI.Mathematics
+namespace JohnFarmer.Mathematics
 {
 	public static class MatrixExtension
 	{

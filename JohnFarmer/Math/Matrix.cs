@@ -1,10 +1,10 @@
-using CommunityToolkit.HighPerformance;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using CommunityToolkit.HighPerformance;
 
-namespace MathAndAI.Mathematics
+namespace JohnFarmer.Mathematics
 {
 	public struct Matrix
 	{
@@ -67,9 +67,16 @@ namespace MathAndAI.Mathematics
 		public double[] ToArray()
 		{
 			List<double> doubles = new List<double>();
-			for (int row = 0; row < rows; row++)
-				for (int column = 0; column < columns; column++)
-					doubles.Add(values[row, column]);
+			Span<double> span = values.AsSpan();
+			ref var start = ref MemoryMarshal.GetReference(span);
+			ref var end = ref Unsafe.Add(ref start, span.Length);
+
+			while (Unsafe.IsAddressLessThan(ref start, ref end))
+			{
+				doubles.Add(start);
+				start = ref Unsafe.Add(ref start, 1);
+			}
+
 			return doubles.ToArray();
 		}
 		
@@ -85,9 +92,17 @@ namespace MathAndAI.Mathematics
 		public double GetSum()
 		{
 			double sum = 0;
-			for (int row = 0; row < rows; row++)
-				for (int column = 0; column < columns; column++)
-					sum += values[row, column];
+
+			Span<double> span = values.AsSpan();
+			ref var start = ref MemoryMarshal.GetReference(span);
+			ref var end = ref Unsafe.Add(ref start, span.Length);
+
+			while (Unsafe.IsAddressLessThan(ref start, ref end))
+			{
+				sum += start;
+				start = ref Unsafe.Add(ref start, 1);
+			}
+
 			return sum;
 		}
 
@@ -153,7 +168,7 @@ namespace MathAndAI.Mathematics
 				for (int column = 0; column < product.columns; column++)
 				{
 					double sum = 0;
-					if (matrix1.rows * matrix1.columns <= 300)
+					if (useUnsafe)
 					{
 						Span<double> span1 = matrix1Span.GetRowSpan(row);
 						ref var start1 = ref MemoryMarshal.GetReference(span1);

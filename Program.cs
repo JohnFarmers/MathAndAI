@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using MathAndAI.NeuralNetwork;
+using JohnFarmer.NeuralNetwork;
 using System.Linq;
-using MathAndAI.Mathematics;
+using JohnFarmer.Mathematics;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Reports;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using CommunityToolkit.HighPerformance;
+using MathAndAI.JohnFarmer.Utility;
+using System.Reflection;
+using JohnFarmer.Utility;
+using JohnFarmer.Algorithms.NEAT;
 
-namespace MathAndAI
+namespace JohnFarmer
 {
 	public class Program
 	{
@@ -21,7 +29,7 @@ namespace MathAndAI
 		
 		private static void Main(string[] args)
 		{
-			TestNN();
+			BenchmarkRunner.Run<BenchMark>();
 		}
 
 		/*private static void CNNTest()

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MathAndAI.NeuralNetwork
+namespace JohnFarmer.NeuralNetwork
 {
 	public class LongShortTermMemory
 	{
