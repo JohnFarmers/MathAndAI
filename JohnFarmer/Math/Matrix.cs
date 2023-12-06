@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using CommunityToolkit.HighPerformance;
+using JohnFarmer.Utility;
 
 namespace JohnFarmer.Mathematics
 {
@@ -40,10 +41,9 @@ namespace JohnFarmer.Mathematics
 
 		public Matrix Randomize()
 		{
-			Random random = new Random();
 			for (int row = 0; row < rows; row++)
 				for (int column = 0; column < columns; column++)
-					values[row, column] = random.NextDouble() * 2 - 1;
+					values[row, column] = RandomUtil.Range(-1d, 1d);
 			return this;
 		}
 

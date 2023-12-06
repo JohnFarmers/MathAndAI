@@ -1,5 +1,8 @@
-﻿namespace JohnFarmer.Algorithms.NEAT
+﻿using System;
+
+namespace JohnFarmer.NeuralNetwork.NeuronAndSynapse
 {
+	[Serializable]
 	public class Synapse
 	{
 		public double weight = 1;

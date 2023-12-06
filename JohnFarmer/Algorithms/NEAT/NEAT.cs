@@ -1,87 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using JohnFarmer.NeuralNetwork.NeuronAndSynapse;
+using CommunityToolkit.HighPerformance;
+using JohnFarmer.Utility;
 
 namespace JohnFarmer.Algorithms.NEAT
 {
-	public class NEAT
+	[Serializable]
+	public class NEAT : NeuralNetwork.NeuronAndSynapse.NeuralNetwork
 	{
-		public int[] layerNodes;
-		public readonly Func<double, double> activationFunction;
-		public readonly List<List<Neuron>> layers;
-		public readonly List<Synapse> synapses;
-		private readonly Random random;
+		public NEAT(int[] layerNodes, Func<double, double> activationFunction) : base(layerNodes, activationFunction) { }
 
-		public NEAT(int[] layerNodes, Func<double, double> activationFunction)
-		{
-			this.layerNodes = layerNodes;
-			this.activationFunction = activationFunction;
-			layers = new List<List<Neuron>>();
-			synapses = new List<Synapse>();
-			random = new Random();
-			Initialize();
-		}
-
-		public virtual void Initialize()
-		{
-			for (int i = 0; i < layerNodes.Length; i++)
-			{
-				int length = layerNodes[i];
-				List<Neuron> layer = new List<Neuron>();
-				bool isInputLayer = i == 0; 
-				bool isOutputLayer =  i == layerNodes.Length - 1;
-				for (int j = 0; j < length; j++)
-					layer.Add(new Neuron(isInputLayer ? 0 : RandNum(), activationFunction, isInputLayer, isOutputLayer));
-				layers.Add(layer);
-			}
-
-			for (int i = 0; i < layerNodes.Length - 1; i++)
-			{
-				List<Neuron> currentLayer = layers[i];
-				List<Neuron> nextLayer = layers[i + 1];
-				for (int j = 0; j < currentLayer.Count; j++)
-				{
-					for (int k = 0; k < nextLayer.Count; k++)
-					{
-						Neuron hiddenNeuron = currentLayer[j];
-						Neuron nextHiddenNeuron = nextLayer[k];
-						Synapse synapse = new Synapse(RandNum(), hiddenNeuron, nextHiddenNeuron);
-						hiddenNeuron.outSynapses.Add(synapse);
-						nextHiddenNeuron.inSynapses.Add(synapse);
-						synapses.Add(synapse);
-					}
-				}
-			}
-		}
-
-		public virtual double[] Forward(double[] inputs)
-		{
-			for (int i = 0; i < inputs.Length; i++)
-				layers[0][i].input = inputs[i];
-			layers.ForEach(layer => layer.ForEach(neuron => neuron.Evaluate()));
-			List<Neuron> outputLayer = layers[^1];
-			double[] outputs = new double[outputLayer.Count];
-			for (int i = 0; i < outputLayer.Count; i++)
-				outputs[i] = outputLayer[i].output;
-			return outputs;
-		}
-
-		public virtual Neuron AddNeuron(int layerIndex, List<Neuron> inNeuron, List<Neuron> outNeuron)
+		public virtual Neuron AddNeuron(int layerIndex, List<Neuron> inNeurons, List<Neuron> outNeurons)
 		{
 			if(layerIndex == 0 || layerIndex == layers.Count - 1)
 				throw new Exception("Adding neuron to input or output layer is not allowed");
 			Neuron neuron = new Neuron(RandNum(), activationFunction);
-			for (int i = 0; i < inNeuron.Count; i++)
+			Span<Neuron> inNeuronsSpan = inNeurons.AsSpan();
+			for (int i = 0; i < inNeuronsSpan.Length; i++)
 			{
-				Synapse synapse = new Synapse(RandNum(), inNeuron[i], neuron);
+				Synapse synapse = new Synapse(RandNum(), inNeuronsSpan[i], neuron);
 				neuron.inSynapses.Add(synapse);
-				inNeuron[i].outSynapses.Add(synapse);
+				inNeuronsSpan[i].outSynapses.Add(synapse);
 				synapses.Add(synapse);
 			}
-			for (int i = 0; i < outNeuron.Count; i++)
+			Span<Neuron> outNeuronsSpan = outNeurons.AsSpan();
+			for (int i = 0; i < outNeuronsSpan.Length; i++)
 			{
-				Synapse synapse = new Synapse(RandNum(), neuron, outNeuron[i]);
+				Synapse synapse = new Synapse(RandNum(), neuron, outNeuronsSpan[i]);
 				neuron.outSynapses.Add(synapse);
-				outNeuron[i].inSynapses.Add(synapse);
+				outNeuronsSpan[i].inSynapses.Add(synapse);
 				synapses.Add(synapse);
 			}
 			layers[layerIndex].Add(neuron);
@@ -125,16 +73,64 @@ namespace JohnFarmer.Algorithms.NEAT
 			synapses.Remove(synapse);
 		}
 
-		public void Mutate()
+		public virtual void MutateRandomWeight(int amount)
 		{
-			//TODO
+			for (int i = 0; i < amount; i++)
+				synapses.GetRandom().weight = RandNum() * RandomUtil.Range(1, 10);
+		}
+
+		public virtual void MutateRandomBias(int amount)
+		{
+			for (int i = 0; i < amount; i++)
+				layers.GetRandom().GetRandom().bias = RandNum() * RandomUtil.Range(1, 10);
+		}
+
+		public virtual void Mutate()
+		{
+			int rng = RandomUtil.Range(0, 5);
+			int layer = RandomUtil.Range(1, layerNodes.Length - 1);
+			switch (rng)
+			{
+				case 0:
+					AddNeuron(layer, GetRandomNeurons(layer, true), GetRandomNeurons(layer, false));
+					break;
+				case 1:
+					if (layers[layer].Count > 1)
+						RemoveNeuron(layer, layers[layer].GetRandom());
+					break;
+				case 2:
+					AddSynapse(layers[layer].GetRandom(), layers[RandomUtil.Range(layer + 1, layers.Count)].GetRandom());
+					break;
+				case 3:
+					if (synapses.Count > 1)
+						RemoveSynapse(synapses.GetRandom());
+					break;
+				case 4:
+					MutateRandomWeight(RandomUtil.Range(1, 11));
+					break;
+				case 5:
+					MutateRandomBias(RandomUtil.Range(1, 11));
+					break;
+				default:
+					break;
+			}
+
+			List<Neuron> GetRandomNeurons(int currentLayer, bool getFromLeft)
+			{
+				List<Neuron> neurons = new List<Neuron>();
+				int layer = RandomUtil.Range(getFromLeft ? 0 : currentLayer + 1, getFromLeft ? currentLayer - 1 : layerNodes.Length);
+				int amount = RandomUtil.Range(0, layerNodes[layer] - 1);
+
+				for (int i = 0; i < amount; i++)
+					neurons.Add(layers[layer].GetRandom());
+
+				return neurons;
+			}
 		}
 
 		public static NEAT Crossover(NEAT a, NEAT b)
 		{
-			return null; //Temp
+			return null; //TODO
 		}
-
-		private double RandNum() => random.NextDouble() * 2 - 1;
 	}
 }

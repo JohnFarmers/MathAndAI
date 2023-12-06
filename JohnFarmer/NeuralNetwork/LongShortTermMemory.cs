@@ -1,3 +1,4 @@
+using JohnFarmer.Utility;
 using System;
 using System.Collections.Generic;
 
@@ -26,8 +27,7 @@ namespace JohnFarmer.NeuralNetwork
 
 		public LongShortTermMemory(Func<double, double, double> lossFunction)
 		{
-			Random random = new Random();
-			double RandomInitValue() => random.NextDouble() * 2 - 1;
+			double RandomInitValue() => RandomUtil.Range(-1d, 1d);
 			forgetGateWeight = RandomInitValue();
 			forgetGateUWeight = RandomInitValue();
 			forgetGateBias = RandomInitValue();

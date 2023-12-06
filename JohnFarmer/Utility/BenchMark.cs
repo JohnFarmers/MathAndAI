@@ -8,13 +8,11 @@ using System.Collections.Generic;
 using JohnFarmer.Utility;
 using JohnFarmer.Algorithms.NEAT;
 using JohnFarmer.NeuralNetwork;
+using JohnFarmer.NeuralNetwork.NeuronAndSynapse;
 
 //A class for testing performance of methods/functions.
-namespace JohnFarmer
+[MemoryDiagnoser]
+public class BenchMark
 {
-	[MemoryDiagnoser]
-	public class BenchMark
-	{
-		
-	}
+	
 }

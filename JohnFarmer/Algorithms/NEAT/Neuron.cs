@@ -1,8 +1,10 @@
-﻿using System;
+﻿using CommunityToolkit.HighPerformance;
+using System;
 using System.Collections.Generic;
 
-namespace JohnFarmer.Algorithms.NEAT
+namespace JohnFarmer.NeuralNetwork.NeuronAndSynapse
 {
+	[Serializable]
 	public class Neuron
 	{
 		public double input;
@@ -10,9 +12,9 @@ namespace JohnFarmer.Algorithms.NEAT
 		public Func<double, double> activationFunction;
 		public List<Synapse> inSynapses;
 		public List<Synapse> outSynapses;
-		public double output;
 		public readonly bool isInputLayer;
 		public readonly bool isOutputLayer;
+		public double Output { get; private set; }
 
 		public Neuron(double bias, Func<double, double> activationFunction, bool isInputLayer = false, bool isOutputLayer = false)
 		{
@@ -27,9 +29,11 @@ namespace JohnFarmer.Algorithms.NEAT
 		public double Evaluate()
 		{
 			double weightedSum = isInputLayer ? input : 0;
-			inSynapses.ForEach(s => weightedSum += s.weight * s.inNeuron.output);
-			output = activationFunction(weightedSum + bias);
-			return output;
+			Span<Synapse> synapses = inSynapses.AsSpan();
+			for (int i = 0; i < synapses.Length; i++)
+				weightedSum += synapses[i].weight * synapses[i].inNeuron.Output;
+			Output = activationFunction(weightedSum + bias);
+			return Output;
 		}
 
 		public void Remove()

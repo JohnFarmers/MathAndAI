@@ -2,7 +2,7 @@
 using System.Linq;
 using JohnFarmer.Mathematics;
 
-namespace JohnFarmer.NeuralNetwork
+namespace JohnFarmer.NeuralNetwork.Matrices
 {
 	public class ConvolutionalNeuralNetwork : NeuralNetwork
 	{
