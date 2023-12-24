@@ -24,21 +24,17 @@ public class Program
 		{ new double[] { 1, 1 }, new double[] { 0 } },
 	};
 
-	private static readonly NeuralNetwork nn = new NeuralNetwork(new int[] { 2, 3, 1 }, ActivationFunction.Sigmoid, ActivationFunction.SigmoidPrime, CostFunction.CrossEntropyLoss, .1, .1);
+	private static readonly NeuralNetwork nn = new NeuralNetwork(new int[] { 2, 3, 1 }, ActivationFunction.Sigmoid, ActivationFunction.SigmoidPrime, LossFunction.CrossEntropyLoss, .1, .1);
 		
 	private static void Main(string[] args)
 	{
 		//BenchmarkRunner.Run<BenchMark>();
-		NEAT neat = new NEAT(new int[] { 5, 3, 4, 2 }, ActivationFunction.Sigmoid);
-
-		foreach(var x in neat.Forward(new double[] { 5, 4, 3, 2, 1 })) 
-			Console.WriteLine(x);
-
-		for (int i = 0; i < 10; i++)
-			neat.Mutate();
-
-		foreach (var x in neat.Forward(new double[] { 5, 4, 3, 2, 1 }))
-			Console.WriteLine(x);
+		PrimitiveOperation operation = PrimitiveOperation.Multiply(new Variable(2), new Constant(2));
+		Console.WriteLine(operation.a);
+		Console.WriteLine(operation.b);
+		Console.WriteLine(operation.result);
+		Console.WriteLine(operation.dyda);
+		Console.WriteLine(operation.dydb);
 	}
 
 	/*private static void CNNTest()
