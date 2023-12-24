@@ -29,7 +29,7 @@ public class Program
 	private static void Main(string[] args)
 	{
 		//BenchmarkRunner.Run<BenchMark>();
-		PrimitiveOperation operation = PrimitiveOperation.Multiply(new Variable(2), new Constant(2));
+		Operation operation = Operation.Multiply(new Variable(2), new Constant(2));
 		Console.WriteLine(operation.a);
 		Console.WriteLine(operation.b);
 		Console.WriteLine(operation.result);
@@ -88,7 +88,7 @@ public class Program
 		foreach (double[] input in trainingDatas.Keys)
 		{
 			string outputs = "[";
-			foreach (double d in nn.Predict(input))
+			foreach (double d in nn.Forward(input))
 				outputs += d + ",";
 			Console.WriteLine(input + ": " + outputs.Remove(outputs.Length - 1) + "]");
 		}
@@ -103,7 +103,7 @@ public class Program
 		foreach (double[] input in trainingDatas.Keys)
 		{
 			string outputs = "[";
-			foreach (double d in nn.Predict(input))
+			foreach (double d in nn.Forward(input))
 				outputs += d + ",";
 			Console.WriteLine(input + ": " + outputs.Remove(outputs.Length - 1) + "]");
 		}

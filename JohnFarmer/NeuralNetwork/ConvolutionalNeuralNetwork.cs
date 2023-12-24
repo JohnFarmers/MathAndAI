@@ -13,7 +13,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 			Matrix featureMap = Convolve(inputs.ToMatrix(), kernel.ToMatrix());
 			featureMap.Map(ActivationFunction.ReLU);
 			Matrix maxPool = MaxPool(featureMap, Convert.ToInt32(featureMap.rows / 2), Convert.ToInt32(featureMap.columns / 2));
-			return base.Predict(maxPool.ToArray());
+			return base.Forward(maxPool.ToArray());
 		}
 
 		private Matrix Convolve(Matrix inputs, Matrix kernel)

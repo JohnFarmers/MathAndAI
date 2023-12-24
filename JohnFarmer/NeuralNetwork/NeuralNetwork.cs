@@ -54,7 +54,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 		/// <summary>
 		/// Perform a forward propagation and return the predicted value.
 		/// </summary>
-		public virtual double[] Predict(double[] inputs)
+		public virtual double[] Forward(double[] inputs)
 		{
 			Matrix prediction = new Matrix();
 			Matrix matrixInputs = inputs.To1DMatrix();
@@ -91,7 +91,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 				weights[l - 1] -= dcdz * activations[l - 1].Transpose() * learningRate;
 				biases[l - 1] -= dcdz * learningRate;
 			}
-			double[] outputsArray = Predict(inputs).ToArray();
+			double[] outputsArray = Forward(inputs).ToArray();
 			int correctPrediction = 0;
 			for(int i = 0; i < outputsArray.Length; i++)
 				if (Math.Abs(outputsArray[i] - targetOutputs[i]) <= errorMaxRange)

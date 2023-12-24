@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,13 +7,13 @@ namespace JohnFarmer.Utility
 {
 	public class AutoGradient
 	{
-        private readonly List<PrimitiveOperation> operations = new List<PrimitiveOperation>();
+		private readonly List<Operation> operations = new List<Operation>();
 
-		public void Record(PrimitiveOperation operation) => operations.Add(operation);
+		public void Record(Operation operation) => operations.Add(operation);
 
-		public void Record(params PrimitiveOperation[] operations)
+		public void Record(params Operation[] operations)
 		{
-			Span<PrimitiveOperation> span = operations.AsSpan();
+			Span<Operation> span = operations.AsSpan();
 			ref var start = ref MemoryMarshal.GetReference(span);
 			ref var end = ref Unsafe.Add(ref start, span.Length);
 
