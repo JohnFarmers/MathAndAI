@@ -19,7 +19,7 @@ namespace JohnFarmer.Utility
 				operation.b.gradient = operation.dydb;
 		}
 		
-		public static void Backward(Operation operation, dynamic gradient = null)
+		private static void Backward(Operation operation, dynamic gradient = null)
 		{
 			gradient = gradient != null ? gradient : 1;
 			if (operation.aType == typeof(Operation))
