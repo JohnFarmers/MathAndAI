@@ -7,21 +7,29 @@ namespace JohnFarmer.Utility
 {
 	public class AutoGradient
 	{
-		private readonly List<Operation> operations = new List<Operation>();
-
-		public void Record(Operation operation) => operations.Add(operation);
-
-		public void Record(params Operation[] operations)
+		public static void Backward(Operation operation)
 		{
-			Span<Operation> span = operations.AsSpan();
-			ref var start = ref MemoryMarshal.GetReference(span);
-			ref var end = ref Unsafe.Add(ref start, span.Length);
-
-			while (Unsafe.IsAddressLessThan(ref start, ref end))
-			{
-				this.operations.Add(start);
-				start = ref Unsafe.Add(ref start, 1);
-			}
+			if (operation.aType == typeof(Operation))
+				Backward(operation.a, operation.dyda);
+			if (operation.bType == typeof(Operation))
+				Backward(operation.b, operation.dydb);
+			if (operation.aType == typeof(Variable) && operation.a != null && operation.a.requiredGrad && operation.dyda != null)
+				operation.a.gradient = operation.dyda;
+			if (operation.bType == typeof(Variable) && operation.b != null && operation.b.requiredGrad && operation.dydb != null)
+				operation.b.gradient = operation.dydb;
+		}
+		
+		public static void Backward(Operation operation, dynamic gradient = null)
+		{
+			gradient = gradient != null ? gradient : 1;
+			if (operation.aType == typeof(Operation))
+				Backward(operation.a, operation.dyda * gradient);
+			if (operation.bType == typeof(Operation))
+				Backward(operation.b, operation.dydb * gradient);
+			if (operation.aType == typeof(Variable) && operation.a != null && operation.a.requiredGrad && operation.dyda != null)
+				operation.a.gradient = operation.dyda * gradient;
+			if (operation.bType == typeof(Variable) && operation.b != null && operation.b.requiredGrad && operation.dydb != null)
+				operation.b.gradient = operation.dydb * gradient;
 		}
 	}
 }

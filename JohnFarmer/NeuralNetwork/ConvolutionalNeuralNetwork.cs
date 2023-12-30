@@ -6,7 +6,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 {
 	public class ConvolutionalNeuralNetwork : NeuralNetwork
 	{
-		public ConvolutionalNeuralNetwork(int[] layers, Func<double, double> activationFunction, Func<double, double> activationFunctionDerivative, Func<double, double, double> costFunction, double learningRate = 0.1, double errorMaxRange = 0.1) : base(layers, activationFunction, activationFunctionDerivative, costFunction, learningRate, errorMaxRange) { }
+		public ConvolutionalNeuralNetwork(int[] layers, Func<double, double> activationFunction, Func<double, double> activationFunctionDerivative, Func<double, double, double> lossFunction, double learningRate = 0.1, double errorMaxRange = 0.1) : base(layers, activationFunction, activationFunctionDerivative, lossFunction, learningRate, errorMaxRange) { }
 
 		public double[] Predict(double[,] inputs, double[,] kernel)
 		{

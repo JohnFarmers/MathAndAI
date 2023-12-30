@@ -10,7 +10,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 		public readonly int[] layerNodes;
 		public List<Matrix> weights, biases;
 		public Func<double, double> activationFunction, activationFunctionDerivative;
-		public Func<double, double, double> costFunction;
+		public Func<double, double, double> lossFunction;
 		public double learningRate, errorMaxRange, accuracy = 0;
 
 		/// <summary>
@@ -19,17 +19,17 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 		/// <param name="layerNodes">The number of node in each layer.</param>
 		/// <param name="activationFunction">A function that decides whether a neuron should be activated or not.</param>
 		/// <param name="activationFunctionDerivative">The derivative of the activation function.</param>
-		/// <param name="costFunction">A function that used to estimate how badly neural network are performing.</param>
+		/// <param name="lossFunction">A function that used to estimate how badly neural network are performing.</param>
 		/// <param name="learningRate">Determine how fast the neural network will adjust it's parameters in each iteration of training.</param>
 		/// <param name="errorMaxRange">The maximum difference between the outputs and target outputs can have to be consider correct.</param>
-		public NeuralNetwork(int[] layerNodes, Func<double, double> activationFunction, Func<double, double> activationFunctionDerivative, Func<double, double, double> costFunction, double learningRate = .1, double errorMaxRange = .1)
+		public NeuralNetwork(int[] layerNodes, Func<double, double> activationFunction, Func<double, double> activationFunctionDerivative, Func<double, double, double> lossFunction, double learningRate = .1, double errorMaxRange = .1)
 		{
 			if (layerNodes.Length < 2)
 				throw new Exception("Neural Network must have atleast 2 layers");
 			this.layerNodes = layerNodes;
 			this.activationFunction = activationFunction;
 			this.activationFunctionDerivative = activationFunctionDerivative;
-			this.costFunction = costFunction;
+			this.lossFunction = lossFunction;
 			this.learningRate = learningRate;
 			this.errorMaxRange = errorMaxRange;
 			Initialize();
