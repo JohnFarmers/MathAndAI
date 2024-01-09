@@ -20,12 +20,33 @@ public class Program
 	private static void Main(string[] args)
 	{
 		//BenchmarkRunner.Run<BenchMark>();
-		AutoGradTest();
+		LSTMTest();
+	}
+
+	private static void LSTMTest()
+	{
+		double[] inputs = new double[] { 0d, .25d, .5d, .75d };
+		//double[] inputs2 = new double[] { 1d, .5d, .25d };
+		LSTM lstm = new(LossFunction.SquaredError, .1d);
+		Console.WriteLine("Pre-train:");
+		double output = lstm.Forward(inputs);
+		Console.WriteLine(output);
+		/*output = lstm.Forward(inputs2);
+		Console.WriteLine(output);*/
+		for (int i = 0; i < 5000; i++)
+			lstm.Train(inputs, 1d);
+		/*for (int i = 0; i < 3000; i++)
+			lstm.Train(inputs2, 0d);*/
+		Console.WriteLine("\nPost-train:");
+		output = lstm.Forward(inputs);
+		Console.WriteLine(output);
+		/*output = lstm.Forward(inputs2);
+		Console.WriteLine(output);*/
 	}
 
 	private static void AutoGradTest()
 	{
-		Variable x = new(RandomUtil.Range(-1d, 2d));
+		Variable x = RandomUtil.Range(-1d, 2d);
 		Variable W1 = new(RandomUtil.Range(-1d, 2d), true);
 		Variable b1 = new(RandomUtil.Range(-1d, 2d), true);
 		Variable W2 = new(RandomUtil.Range(-1d, 2d), true);
@@ -50,10 +71,10 @@ public class Program
 			Console.WriteLine("Loss: " + op_loss.result);
 
 			AutoGradient.Backward(op_loss);
-			W1.value -= W1.gradient * l;
-			b1.value -= b1.gradient * l;
-			W2.value -= W2.gradient * l;
-			b2.value -= b2.gradient * l;
+			W1.Optimize(l);
+			b1.Optimize(l);
+			W2.Optimize(l);
+			b2.Optimize(l);
 			Console.WriteLine("\n");
 		}
 	}

@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 
 namespace JohnFarmer.Utility
 {
-	public class AutoGradient
+	public static class AutoGradient
 	{
-		public static void Backward(Operation operation)
+		public static void Backward(this Operation operation)
 		{
-			if (operation.aType == typeof(Operation))
+			if (operation.aType == typeof(Operation) && operation.dyda != null)
 				Backward(operation.a, operation.dyda);
-			if (operation.bType == typeof(Operation))
+			if (operation.bType == typeof(Operation) && operation.dydb != null)
 				Backward(operation.b, operation.dydb);
 			if (operation.aType == typeof(Variable) && operation.a != null && operation.a.requiredGrad && operation.dyda != null)
 				operation.a.gradient = operation.dyda;
@@ -19,17 +19,17 @@ namespace JohnFarmer.Utility
 				operation.b.gradient = operation.dydb;
 		}
 		
-		public static void Backward(Operation operation, dynamic gradient = null)
+		public static void Backward(this Operation operation, dynamic accumulatedGradient = null)
 		{
-			gradient = gradient != null ? gradient : 1;
-			if (operation.aType == typeof(Operation))
-				Backward(operation.a, operation.dyda * gradient);
-			if (operation.bType == typeof(Operation))
-				Backward(operation.b, operation.dydb * gradient);
-			if (operation.aType == typeof(Variable) && operation.a != null && operation.a.requiredGrad && operation.dyda != null)
-				operation.a.gradient = operation.dyda * gradient;
-			if (operation.bType == typeof(Variable) && operation.b != null && operation.b.requiredGrad && operation.dydb != null)
-				operation.b.gradient = operation.dydb * gradient;
+			accumulatedGradient ??= 1;
+			if (operation.aType == typeof(Operation) && operation.dyda != null)
+				Backward(operation.a, operation.dyda * accumulatedGradient);
+			if (operation.bType == typeof(Operation) && operation.dydb != null)
+				Backward(operation.b, operation.dydb * accumulatedGradient);
+			if (operation.aType == typeof(Variable) && operation.a.requiredGrad && operation.dyda != null)
+				operation.a.gradient = operation.dyda * accumulatedGradient;
+			if (operation.bType == typeof(Variable) && operation.b.requiredGrad && operation.dydb != null)
+				operation.b.gradient = operation.dydb * accumulatedGradient;
 		}
 	}
 }

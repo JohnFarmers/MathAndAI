@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JohnFarmer.Mathematics;
+using System;
 
 namespace JohnFarmer.Utility
 {
@@ -15,6 +16,8 @@ namespace JohnFarmer.Utility
 			this.type = value.GetType();
 			this.requiredGrad = requiredGrad;
 		}
+
+		public void Optimize(double learningRate = 1d) => value -= gradient * learningRate;
 
 		public static dynamic operator +(Variable a, Variable b) => a.value + b.value;
 
@@ -41,5 +44,17 @@ namespace JohnFarmer.Utility
 		public static implicit operator double(Variable variable) => Convert.ChangeType(variable.value, typeof(double));
 
 		public static implicit operator long(Variable variable) => Convert.ChangeType(variable.value, typeof(long));
+
+		public static implicit operator Matrix(Variable variable) => Convert.ChangeType(variable.value, typeof(Matrix));
+
+		public static implicit operator Variable(int a) => new Variable(a);
+
+		public static implicit operator Variable(float a) => new Variable(a);
+
+		public static implicit operator Variable(double a) => new Variable(a);
+
+		public static implicit operator Variable(long a) => new Variable(a);
+
+		public static implicit operator Variable(Matrix a) => new Variable(a);
 	}
 }

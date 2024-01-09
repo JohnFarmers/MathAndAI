@@ -21,6 +21,16 @@ namespace JohnFarmer.Mathematics
 				for (int column = 0; column < columns; column++)
 					values[row, column] = 0;
 		}
+		
+		public Matrix(int rows, int columns, double initValue)
+		{
+			this.rows = rows;
+			this.columns = columns;
+			values = new double[rows, columns];
+			for (int row = 0; row < rows; row++)
+				for (int column = 0; column < columns; column++)
+					values[row, column] = initValue;
+		}
 
 		public double this[int row, int column] { get => values[row, column]; set => values[row, column] = value; }
 
@@ -194,6 +204,17 @@ namespace JohnFarmer.Mathematics
 				}
 			}
 			return product;
+		}
+
+		public static Matrix operator /(Matrix matrix1, Matrix matrix2)
+		{
+			if (matrix1.rows != matrix2.rows || matrix1.columns != matrix2.columns)
+				throw new Exception("The dimension of the matrix must match.");
+			Matrix result = new Matrix(matrix1.rows, matrix1.columns);
+			for (int row = 0; row < result.rows; row++)
+				for (int column = 0; column < result.columns; column++)
+					result[row, column] = matrix1[row, column] / matrix2[row, column];
+			return result;
 		}
 
 		public static Matrix operator +(Matrix matrix, double value)
