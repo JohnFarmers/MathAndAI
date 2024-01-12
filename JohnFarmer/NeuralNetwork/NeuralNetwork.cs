@@ -9,8 +9,8 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 	{
 		public readonly int[] layerNodes;
 		public List<Matrix> weights, biases;
-		public Func<double, double> activationFunction, activationFunctionDerivative;
-		public Func<double, double, double> lossFunction;
+		public Func<dynamic, dynamic> activationFunction, activationFunctionDerivative;
+		public Func<dynamic, dynamic, dynamic> lossFunction;
 		public double learningRate, errorMaxRange, accuracy = 0;
 
 		/// <summary>
@@ -22,7 +22,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 		/// <param name="lossFunction">A function that used to estimate how badly neural network are performing.</param>
 		/// <param name="learningRate">Determine how fast the neural network will adjust it's parameters in each iteration of training.</param>
 		/// <param name="errorMaxRange">The maximum difference between the outputs and target outputs can have to be consider correct.</param>
-		public NeuralNetwork(int[] layerNodes, Func<double, double> activationFunction, Func<double, double> activationFunctionDerivative, Func<double, double, double> lossFunction, double learningRate = .1, double errorMaxRange = .1)
+		public NeuralNetwork(int[] layerNodes, Func<dynamic, dynamic> activationFunction, Func<dynamic, dynamic> activationFunctionDerivative, Func<dynamic, dynamic, dynamic> lossFunction, double learningRate = .1, double errorMaxRange = .1)
 		{
 			if (layerNodes.Length < 2)
 				throw new Exception("Neural Network must have atleast 2 layers");

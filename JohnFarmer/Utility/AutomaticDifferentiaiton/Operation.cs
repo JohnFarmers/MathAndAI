@@ -1,10 +1,10 @@
-﻿using JohnFarmer.Mathematics;
+﻿using System;
+using JohnFarmer.Mathematics;
 using JohnFarmer.NeuralNetwork;
-using System;
 
 namespace JohnFarmer.Utility
 {
-	public class Operation
+	public partial class Operation
 	{
 		public readonly dynamic a;
 		public readonly dynamic b;
@@ -16,7 +16,7 @@ namespace JohnFarmer.Utility
 		public readonly Type resultType;
 		public readonly OperationType type;
 
-		private Operation(dynamic a, dynamic b, dynamic result, dynamic dyda, dynamic dydb, OperationType type)
+		public Operation(dynamic a, dynamic b, dynamic result, dynamic dyda, dynamic dydb, OperationType type)
 		{
 			this.a = a;
 			this.b = b;
@@ -29,21 +29,25 @@ namespace JohnFarmer.Utility
 			this.type = type;
 		}
 
-		public static dynamic operator +(Operation a, Operation b) => a.result + b.result;
+		public static dynamic operator +(Operation a, Operation b) => new Operation(a, b, a.result + b.result, 1d, 1d, OperationType.Add);
 
-		public static dynamic operator +(Operation a, dynamic b) => a.result + b;
+		public static dynamic operator +(Operation a, dynamic b) => new Operation(a, b, a.result + b, 1d, 1d, OperationType.Add);
 
-		public static dynamic operator -(Operation a, Operation b) => a.result - b.result;
+		public static dynamic operator -(Operation a, Operation b) => new Operation(a, b, a.result - b.result, 1d, -1d, OperationType.Subtract);
 
-		public static dynamic operator -(Operation a, dynamic b) => a.result - b;
+		public static dynamic operator -(Operation a, dynamic b) => new Operation(a, b, a.result - b, 1d, -1d, OperationType.Subtract);
 
-		public static dynamic operator *(Operation a, Operation b) => a.result * b.result;
+		public static dynamic operator *(Operation a, Operation b) => new Operation(a, b, a.result * b.result, b.result, a.result, OperationType.Multiply);
 
-		public static dynamic operator *(Operation a, dynamic b) => a.result * b;
+		public static dynamic operator *(Operation a, dynamic b) => new Operation(a, b, a.result * b, b, a.result, OperationType.Multiply);
 
-		public static dynamic operator /(Operation a, Operation b) => a.result / b.result;
+		public static dynamic operator /(Operation a, Operation b) => new Operation(a, b, a.result / b.result, 1d / b.result, -(a.result / (b.result ^ 2d)), OperationType.Divide);
 
-		public static dynamic operator /(Operation a, dynamic b) => a.result / b;
+		public static dynamic operator /(Operation a, dynamic b) => new Operation(a, b, a.result / b, 1d / b, -(a.result / (b ^ 2d)), OperationType.Divide);
+
+		public static dynamic operator ^(Operation a, Operation b) => new Operation(a, b, a.result ^ b.result, b.result * (a.result ^ (b.result - 1d)), (a.result ^ b.result) * Math.Log(a.result), OperationType.Power);
+
+		public static dynamic operator ^(Operation a, dynamic b) => new Operation(a, b, a.result ^ b, b * (a.result ^ (b - 1d)), (a.result ^ b) * Math.Log(a.result), OperationType.Power);
 
 		public static Operation Add(dynamic a, dynamic b) => new Operation(a, b, a + b, 1d, 1d, OperationType.Add);
 
@@ -53,7 +57,7 @@ namespace JohnFarmer.Utility
 
 		public static Operation Divide(dynamic a, dynamic b) => new Operation(a, b, a / b, 1d / b, -(a / (b ^ 2d)), OperationType.Divide);
 
-		public static Operation Power(dynamic a, dynamic b) => new Operation(a, b, a ^ b , b * (a ^ (b - 1d)), (a ^ b) * Math.Log(a), OperationType.Power);
+		public static Operation Power(dynamic a, dynamic b) => new Operation(a, b, a ^ b, b * (a ^ (b - 1d)), (a ^ b) * Math.Log(a), OperationType.Power);
 		
 		public static Operation Root(dynamic a, dynamic b) => new Operation(a, b, a ^ (1d / b), (a ^ ((1d / b) - 1d)) / b, -(((a ^ (1d / b)) * Math.Log(a)) / (b ^ 2d)), OperationType.Root);
 
@@ -117,41 +121,18 @@ namespace JohnFarmer.Utility
 
 		public static Operation ArcTan(Matrix a) => new Operation(a, null, a.Map(ActivationFunction.ArcTan), a.Map(ActivationFunction.ArcTanPrime), null, OperationType.ArcTan);
 
-		public static Operation CrossEntropyLoss(Matrix a, Matrix b) => new Operation(a, b, LossFunction.M_CrossEntropyLoss(a, b), (b / a) * -1d, a.Map(Math.Log) * -1d, OperationType.CrossEntropyLoss);
+		public static Operation CrossEntropyLoss(Matrix a, Matrix b) => new Operation(a, b, LossFunction.M_CrossEntropyLoss(a, b), (b / a) * -1d, a.Map((dynamic x) => Math.Log(x)) * -1d, OperationType.CrossEntropyLoss);
 
 		public static Operation SquaredError(Matrix a, Matrix b) => new Operation(a, b, LossFunction.M_SquaredError(a, b), (b - a) * -2d, (b - a) * 2d, OperationType.SquaredError);
 
-		public override string ToString() => $"a = {a}\nb = {b}\nresult = {result}\ndyda = {dyda}\ndydb = {dydb}";
+		public override string ToString() => $"a = {a},\nb = {b},\nresult = {result},\ndyda = {dyda},\ndydb = {dydb}";
 
-		public static implicit operator int(Operation operation) => Convert.ChangeType(operation.result, typeof(int));
+		public static implicit operator int(Operation operation) => (int)operation.result;
 
-		public static implicit operator float(Operation operation) => Convert.ChangeType(operation.result, typeof(float));
+		public static implicit operator float(Operation operation) => (float)operation.result;
 
-		public static implicit operator double(Operation operation) => Convert.ChangeType(operation.result, typeof(double));
+		public static implicit operator double(Operation operation) => (double)operation.result;
 
-		public static implicit operator long(Operation operation) => Convert.ChangeType(operation.result, typeof(long));
-		
-		public enum OperationType
-		{
-			Add,
-			Subtract,
-			Multiply,
-			Divide,
-			Power,
-			Root,
-			Sin,
-			Cos,
-			Tan,
-			Log,
-			Log10,
-			Exp,
-			Sigmoid,
-			ReLU,
-			SoftPlus,
-			Tanh,
-			ArcTan,
-			CrossEntropyLoss,
-			SquaredError
-		}
+		public static implicit operator long(Operation operation) => (long)operation.result;
 	}
 }

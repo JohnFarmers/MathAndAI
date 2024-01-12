@@ -66,7 +66,7 @@ namespace JohnFarmer.Mathematics
 			return result;
 		}
 
-		public Matrix Map(Func<double, double> function)
+		public Matrix Map(Func<dynamic, dynamic> function)
 		{
 			for (int row = 0; row < rows; row++)
 				for (int column = 0; column < columns; column++)
@@ -133,7 +133,7 @@ namespace JohnFarmer.Mathematics
 			return text;
 		}
 
-		public static Matrix Map(Matrix matrix, Func<double, double> function)
+		public static Matrix Map(Matrix matrix, Func<dynamic, dynamic> function)
 		{
 			Matrix result = new Matrix(matrix.rows, matrix.columns);
 			for (int row = 0; row < result.rows; row++)

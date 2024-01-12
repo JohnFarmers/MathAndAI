@@ -20,7 +20,7 @@ public class Program
 	private static void Main(string[] args)
 	{
 		//BenchmarkRunner.Run<BenchMark>();
-		LSTMTest();
+		AutoGradTest();
 	}
 
 	private static void LSTMTest()
@@ -56,12 +56,12 @@ public class Program
 
 		for (int i = 0; i < 1000; i++)
 		{
-			Operation op_mul1 = Operation.Multiply(W1, x);
-			Operation op_add1 = Operation.Add(op_mul1, b1);
+			Operation op_mul1 = W1 * x;
+			Operation op_add1 = op_mul1 + b1;
 			Operation op_act1 = Operation.Sigmoid(op_add1);
 
-			Operation op_mul2 = Operation.Multiply(W2, op_act1);
-			Operation op_add2 = Operation.Add(op_mul2, b2);
+			Operation op_mul2 = W2 * op_act1;
+			Operation op_add2 = op_mul2 + b2;
 			Operation op_act2 = Operation.Sigmoid(op_add2);
 
 			Operation op_loss = Operation.CrossEntropyLoss(op_act2, y_hat);

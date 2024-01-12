@@ -19,11 +19,11 @@ namespace JohnFarmer.NeuralNetwork
 				outputGateUWeight,
 				outputGateBias;
 		private double learningRate;
-		private readonly Func<double, double> 
+		private readonly Func<dynamic, dynamic> 
 			sigmoid = ActivationFunction.Sigmoid, 
 			tanh = ActivationFunction.Tanh;
 
-		public LSTM(Func<double, double, double> lossFunction, double learningRate)
+		public LSTM(Func<dynamic, dynamic, dynamic> lossFunction, double learningRate)
 		{
 			double RandomInitValue() => RandomUtil.Range(-1d, 1.1d);
 			forgetGateWeight = new(RandomInitValue(), true);

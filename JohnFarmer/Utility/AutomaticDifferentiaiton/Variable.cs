@@ -1,5 +1,5 @@
-﻿using JohnFarmer.Mathematics;
-using System;
+﻿using System;
+using JohnFarmer.Mathematics;
 
 namespace JohnFarmer.Utility
 {
@@ -17,25 +17,29 @@ namespace JohnFarmer.Utility
 			this.requiredGrad = requiredGrad;
 		}
 
-		public void Optimize(double learningRate = 1d) => value -= gradient * learningRate;
+		public void Optimize() => value -= gradient;
 
-		public static dynamic operator +(Variable a, Variable b) => a.value + b.value;
+		public void Optimize(double learningRate) => value -= gradient * learningRate;
 
-		public static dynamic operator +(Variable a, dynamic b) => a.value + b;
+		public static dynamic operator +(Variable a, Variable b) => new Operation(a, b, a.value + b.value, b, a, OperationType.Add);
 
-		public static dynamic operator -(Variable a, Variable b) => a.value - b.value;
+		public static dynamic operator +(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Add);
 
-		public static dynamic operator -(Variable a, dynamic b) => a.value - b;
+		public static dynamic operator -(Variable a, Variable b) => new Operation(a, b, a.value * b.value, b, a, OperationType.Subtract);
 
-		public static dynamic operator *(Variable a, Variable b) => a.value * b.value;
+		public static dynamic operator -(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Subtract);
 
-		public static dynamic operator *(Variable a, dynamic b) => a.value * b;
+		public static dynamic operator *(Variable a, Variable b) => new Operation(a, b, a.value * b.value, b, a, OperationType.Multiply);
 
-		public static dynamic operator /(Variable a, Variable b) => a.value / b.value;
+		public static dynamic operator *(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Multiply);
 
-		public static dynamic operator /(Variable a, dynamic b) => a.value / b;
+		public static dynamic operator /(Variable a, Variable b) => new Operation(a, b, a.value * b.value, b, a, OperationType.Divide);
 
-		public override string ToString() => Convert.ToString(value);
+		public static dynamic operator /(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Divide);
+
+		public static dynamic operator ^(Variable a, Variable b) => new Operation(a, b, a.value ^ b.value, b, a, OperationType.Power);
+
+		public static dynamic operator ^(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Power);
 
 		public static implicit operator int(Variable variable) => Convert.ChangeType(variable.value, typeof(int));
 
@@ -44,8 +48,6 @@ namespace JohnFarmer.Utility
 		public static implicit operator double(Variable variable) => Convert.ChangeType(variable.value, typeof(double));
 
 		public static implicit operator long(Variable variable) => Convert.ChangeType(variable.value, typeof(long));
-
-		public static implicit operator Matrix(Variable variable) => Convert.ChangeType(variable.value, typeof(Matrix));
 
 		public static implicit operator Variable(int a) => new Variable(a);
 
@@ -56,5 +58,7 @@ namespace JohnFarmer.Utility
 		public static implicit operator Variable(long a) => new Variable(a);
 
 		public static implicit operator Variable(Matrix a) => new Variable(a);
+
+		public override string ToString() => Convert.ToString(value);
 	}
 }
