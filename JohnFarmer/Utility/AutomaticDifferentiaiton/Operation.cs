@@ -29,25 +29,25 @@ namespace JohnFarmer.Utility
 			this.type = type;
 		}
 
-		public static dynamic operator +(Operation a, Operation b) => new Operation(a, b, a.result + b.result, 1d, 1d, OperationType.Add);
+		public static Operation operator +(Operation a, Operation b) => new Operation(a, b, a.result + b.result, 1d, 1d, OperationType.Add);
 
-		public static dynamic operator +(Operation a, dynamic b) => new Operation(a, b, a.result + b, 1d, 1d, OperationType.Add);
+		public static Operation operator +(Operation a, dynamic b) => new Operation(a, b, a.result + b, 1d, 1d, OperationType.Add);
 
-		public static dynamic operator -(Operation a, Operation b) => new Operation(a, b, a.result - b.result, 1d, -1d, OperationType.Subtract);
+		public static Operation operator -(Operation a, Operation b) => new Operation(a, b, a.result - b.result, 1d, -1d, OperationType.Subtract);
 
-		public static dynamic operator -(Operation a, dynamic b) => new Operation(a, b, a.result - b, 1d, -1d, OperationType.Subtract);
+		public static Operation operator -(Operation a, dynamic b) => new Operation(a, b, a.result - b, 1d, -1d, OperationType.Subtract);
 
-		public static dynamic operator *(Operation a, Operation b) => new Operation(a, b, a.result * b.result, b.result, a.result, OperationType.Multiply);
+		public static Operation operator *(Operation a, Operation b) => new Operation(a, b, a.result * b.result, b.result, a.result, OperationType.Multiply);
 
-		public static dynamic operator *(Operation a, dynamic b) => new Operation(a, b, a.result * b, b, a.result, OperationType.Multiply);
+		public static Operation operator *(Operation a, dynamic b) => new Operation(a, b, a.result * b, b, a.result, OperationType.Multiply);
 
-		public static dynamic operator /(Operation a, Operation b) => new Operation(a, b, a.result / b.result, 1d / b.result, -(a.result / (b.result ^ 2d)), OperationType.Divide);
+		public static Operation operator /(Operation a, Operation b) => new Operation(a, b, a.result / b.result, 1d / b.result, -(a.result / (b.result ^ 2d)), OperationType.Divide);
 
-		public static dynamic operator /(Operation a, dynamic b) => new Operation(a, b, a.result / b, 1d / b, -(a.result / (b ^ 2d)), OperationType.Divide);
+		public static Operation operator /(Operation a, dynamic b) => new Operation(a, b, a.result / b, 1d / b, -(a.result / (b ^ 2d)), OperationType.Divide);
 
-		public static dynamic operator ^(Operation a, Operation b) => new Operation(a, b, a.result ^ b.result, b.result * (a.result ^ (b.result - 1d)), (a.result ^ b.result) * Math.Log(a.result), OperationType.Power);
+		public static Operation operator ^(Operation a, Operation b) => new Operation(a, b, a.result ^ b.result, b.result * (a.result ^ (b.result - 1d)), (a.result ^ b.result) * Math.Log(a.result), OperationType.Power);
 
-		public static dynamic operator ^(Operation a, dynamic b) => new Operation(a, b, a.result ^ b, b * (a.result ^ (b - 1d)), (a.result ^ b) * Math.Log(a.result), OperationType.Power);
+		public static Operation operator ^(Operation a, dynamic b) => new Operation(a, b, a.result ^ b, b * (a.result ^ (b - 1d)), (a.result ^ b) * Math.Log(a.result), OperationType.Power);
 
 		public static Operation Add(dynamic a, dynamic b) => new Operation(a, b, a + b, 1d, 1d, OperationType.Add);
 

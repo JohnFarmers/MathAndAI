@@ -21,25 +21,25 @@ namespace JohnFarmer.Utility
 
 		public void Optimize(double learningRate) => value -= gradient * learningRate;
 
-		public static dynamic operator +(Variable a, Variable b) => new Operation(a, b, a.value + b.value, b, a, OperationType.Add);
+		public static Operation operator +(Variable a, Variable b) => new Operation(a, b, a.value + b.value, b, a, OperationType.Add);
 
-		public static dynamic operator +(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Add);
+		public static Operation operator +(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Add);
 
-		public static dynamic operator -(Variable a, Variable b) => new Operation(a, b, a.value * b.value, b, a, OperationType.Subtract);
+		public static Operation operator -(Variable a, Variable b) => new Operation(a, b, a.value * b.value, b, a, OperationType.Subtract);
 
-		public static dynamic operator -(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Subtract);
+		public static Operation	operator -(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Subtract);
 
-		public static dynamic operator *(Variable a, Variable b) => new Operation(a, b, a.value * b.value, b, a, OperationType.Multiply);
+		public static Operation operator *(Variable a, Variable b) => new Operation(a, b, a.value * b.value, b, a, OperationType.Multiply);
 
-		public static dynamic operator *(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Multiply);
+		public static Operation operator *(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Multiply);
 
-		public static dynamic operator /(Variable a, Variable b) => new Operation(a, b, a.value * b.value, b, a, OperationType.Divide);
+		public static Operation operator /(Variable a, Variable b) => new Operation(a, b, a.value * b.value, b, a, OperationType.Divide);
 
-		public static dynamic operator /(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Divide);
+		public static Operation operator /(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Divide);
 
-		public static dynamic operator ^(Variable a, Variable b) => new Operation(a, b, a.value ^ b.value, b, a, OperationType.Power);
+		public static Operation operator ^(Variable a, Variable b) => new Operation(a, b, a.value ^ b.value, b, a, OperationType.Power);
 
-		public static dynamic operator ^(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Power);
+		public static Operation operator ^(Variable a, dynamic b) => new Operation(a, b, a.value * b, b, a, OperationType.Power);
 
 		public static implicit operator int(Variable variable) => Convert.ChangeType(variable.value, typeof(int));
 

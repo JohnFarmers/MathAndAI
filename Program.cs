@@ -20,7 +20,7 @@ public class Program
 	private static void Main(string[] args)
 	{
 		//BenchmarkRunner.Run<BenchMark>();
-		AutoGradTest();
+		LSTMTest();
 	}
 
 	private static void LSTMTest()
@@ -51,7 +51,7 @@ public class Program
 		Variable b1 = new(RandomUtil.Range(-1d, 2d), true);
 		Variable W2 = new(RandomUtil.Range(-1d, 2d), true);
 		Variable b2 = new(RandomUtil.Range(-1d, 2d), true);
-		double l = .5d;
+		double l = .1d;
 		double y_hat = 1d;
 
 		for (int i = 0; i < 1000; i++)
@@ -70,7 +70,7 @@ public class Program
 			Console.WriteLine("Result: " + op_act2.result);
 			Console.WriteLine("Loss: " + op_loss.result);
 
-			AutoGradient.Backward(op_loss);
+			op_loss.Backward();
 			W1.Optimize(l);
 			b1.Optimize(l);
 			W2.Optimize(l);

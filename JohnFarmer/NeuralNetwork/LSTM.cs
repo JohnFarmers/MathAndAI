@@ -70,13 +70,13 @@ namespace JohnFarmer.NeuralNetwork
 			for (int i = 0; i < inputs.Length; i++)
 			{
 				double input = inputs[i];
-				Operation forgetGate = Operation.Sigmoid(Operation.Add(Operation.Add(Operation.Multiply(input, forgetGateWeight), Operation.Multiply(hiddenState, forgetGateUWeight)), forgetGateBias));
-				Operation newCellState1 = Operation.Multiply(cellState, forgetGate);
-				Operation inputGate = Operation.Sigmoid(Operation.Add(Operation.Add(Operation.Multiply(input, inputGateWeight), Operation.Multiply(hiddenState, inputGateUWeight)), inputGateBias));
-				Operation newCellState2 = Operation.Add(newCellState1, Operation.Multiply(inputGate, Operation.Tanh(Operation.Add(Operation.Add(Operation.Multiply(input, cellStateUpdateWeight), Operation.Multiply(hiddenState, cellStateUpdateUWeight)), cellStateUpdateBias))));
+				Operation forgetGate = Operation.Sigmoid((input * forgetGateWeight) + (hiddenState * forgetGateUWeight) + forgetGateBias);
+				Operation newCellState1 = forgetGate * cellState;
+				Operation inputGate = Operation.Sigmoid((input * inputGateWeight) + (hiddenState * inputGateUWeight) + inputGateBias);
+				Operation newCellState2 = newCellState1 + (inputGate * Operation.Tanh((input * cellStateUpdateWeight) + (hiddenState * cellStateUpdateUWeight) + cellStateUpdateBias));
 				cellState = newCellState2;
-				Operation outputGate = Operation.Sigmoid(Operation.Add(Operation.Add(Operation.Multiply(input, outputGateWeight), Operation.Multiply(hiddenState, outputGateUWeight)), outputGateBias));
-				Operation newHiddenState = Operation.Multiply(outputGate, Operation.Tanh(newCellState2));
+				Operation outputGate = Operation.Sigmoid((input * outputGateWeight) + (hiddenState * outputGateUWeight) + outputGateBias);
+				Operation newHiddenState = outputGate * Operation.Tanh(newCellState2);
 				hiddenState = newHiddenState;
 				Operation loss = Operation.SquaredError(newHiddenState, targetOutput);
 				totalLoss = totalLoss == null ? loss : Operation.Add(totalLoss, loss);
