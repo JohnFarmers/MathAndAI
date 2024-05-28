@@ -1,6 +1,10 @@
 # MathAndAI
 A repository for storing a C# code where I experiment with math and AI.
 
+Known Issues:
+- AutoGrad doesn't support matrix right now.
+- Operator in Variable class have not been fully implement/fix.
+
 Special thanks to this useful amazing resources for helping me learn and successfully created this project:
 - http://neuralnetworksanddeeplearning.com/index.html
 - https://towardsdatascience.com/understanding-backpropagation-algorithm-7bb3aa2f95fd
