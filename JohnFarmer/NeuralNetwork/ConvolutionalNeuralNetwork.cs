@@ -23,7 +23,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 			Matrix result = new Matrix(inputs.rows - kRows + 1, inputs.columns - kColumns + 1);
 			for (int row = 0; row < result.rows; row++)
 				for (int column = 0; column < result.columns; column++)
-					result[row, column] = Matrix.HadamardProduct(inputs[row..(row + kRows), column..(column + kColumns)], kernel).GetSum();
+					result[row, column] = (inputs[row..(row + kRows), column..(column + kColumns)] * kernel).Sum();
 			return result;
 		}
 

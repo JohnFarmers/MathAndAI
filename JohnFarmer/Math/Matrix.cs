@@ -7,6 +7,7 @@ using JohnFarmer.Utility;
 
 namespace JohnFarmer.Mathematics
 {
+	[Serializable]
 	public struct Matrix
 	{
 		public readonly int rows, columns;
@@ -20,6 +21,13 @@ namespace JohnFarmer.Mathematics
 			for (int row = 0; row < rows; row++)
 				for (int column = 0; column < columns; column++)
 					values[row, column] = 0;
+		}
+		
+		public Matrix(double[,] values)
+		{
+			this.rows = values.GetLength(0);
+			this.columns = values.GetLength(1);
+			this.values = values;
 		}
 		
 		public Matrix(int rows, int columns, double initValue)
@@ -36,7 +44,8 @@ namespace JohnFarmer.Mathematics
 
 		public Matrix this[Range rowRange, Range columnRange]
 		{
-			get {
+			get
+			{
 				int rowStart = rowRange.Start.Value;
 				int rowEnd = rowRange.End.Value;
 				int columnStart = columnRange.Start.Value;
@@ -45,6 +54,17 @@ namespace JohnFarmer.Mathematics
 				for (int row = 0; row < result.rows; row++)
 					for (int column = 0; column < result.columns; column++)
 						result[row, column] = values[row + rowStart, column + columnStart];
+				return result;
+			}
+		}
+
+		public Matrix Identity
+		{
+			get
+			{
+				Matrix result = new Matrix(columns, columns);
+				for (int row = 0; row < result.rows; row++)
+					result[row, row] = 1;
 				return result;
 			}
 		}
@@ -99,7 +119,7 @@ namespace JohnFarmer.Mathematics
 			return doubles;
 		}
 
-		public double GetSum()
+		public double Sum()
 		{
 			double sum = 0;
 
@@ -142,27 +162,7 @@ namespace JohnFarmer.Mathematics
 			return result;
 		}
 
-		public static Matrix HadamardProduct(Matrix matrix1, Matrix matrix2)
-		{
-			if (matrix1.columns != matrix2.columns || matrix1.rows != matrix2.rows)
-				throw new Exception("The dimension of the matrix must match.");
-			Matrix result = new Matrix(matrix1.rows, matrix1.columns);
-			for (int row = 0; row < result.rows; row++)
-				for (int column = 0; column < result.columns; column++)
-					result[row, column] = matrix1[row, column] * matrix2[row, column];
-			return result;
-		}
-
-		public static Matrix operator *(Matrix matrix, double multiplier)
-		{
-			Matrix result = new Matrix(matrix.rows, matrix.columns);
-			for (int row = 0; row < result.rows; row++)
-				for (int column = 0; column < result.columns; column++)
-					result[row, column] = matrix[row, column] * multiplier;
-			return result;
-		}
-
-		public static Matrix operator *(Matrix matrix1, Matrix matrix2)
+		public static Matrix MatMul(Matrix matrix1, Matrix matrix2)
 		{
 			if (matrix1.columns != matrix2.rows)
 				throw new Exception("Columns of matrix1 must match rows of matrix2.");
@@ -204,6 +204,26 @@ namespace JohnFarmer.Mathematics
 				}
 			}
 			return product;
+		}
+
+		public static Matrix operator *(Matrix matrix, double multiplier)
+		{
+			Matrix result = new Matrix(matrix.rows, matrix.columns);
+			for (int row = 0; row < result.rows; row++)
+				for (int column = 0; column < result.columns; column++)
+					result[row, column] = matrix[row, column] * multiplier;
+			return result;
+		}
+
+		public static Matrix operator *(Matrix matrix1, Matrix matrix2)
+		{
+			if (matrix1.columns != matrix2.columns || matrix1.rows != matrix2.rows)
+				throw new Exception("The dimension of the matrix must match.");
+			Matrix result = new Matrix(matrix1.rows, matrix1.columns);
+			for (int row = 0; row < result.rows; row++)
+				for (int column = 0; column < result.columns; column++)
+					result[row, column] = matrix1[row, column] * matrix2[row, column];
+			return result;
 		}
 
 		public static Matrix operator /(Matrix matrix1, Matrix matrix2)

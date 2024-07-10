@@ -8,6 +8,8 @@
 		Divide,
 		Power,
 		Root,
+		MatrixMultiply,
+		HadamardProduct,
 		Sin,
 		Cos,
 		Tan,

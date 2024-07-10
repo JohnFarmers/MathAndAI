@@ -29,17 +29,272 @@ namespace JohnFarmer.Utility
 			this.type = type;
 		}
 
-		public static Operation operator +(Operation a, Operation b) => new Operation(a, b, a.result + b.result, 1d, 1d, OperationType.Add);
+		public static Operation operator +(Operation a, Operation b)
+		{
+			bool aIsMatrix = a.resultType == typeof(Matrix);
+			bool bIsMatrix = b.resultType == typeof(Matrix);
 
-		public static Operation operator +(Operation a, dynamic b) => new Operation(a, b, a.result + b, 1d, 1d, OperationType.Add);
+			if (aIsMatrix && bIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result + b.result, new Matrix(row, col, 1d), new Matrix(row, col, 1d), OperationType.Add);
+			}
+			else if (aIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result + b.result, new Matrix(row, col, 1d), row * col, OperationType.Add);
+			}
+			else if (bIsMatrix)
+			{
+				Matrix B = (Matrix)b.result;
+				int row = B.rows;
+				int col = B.columns;
+				return new Operation(a, b, a.result + b.result, row * col, new Matrix(row, col, 1d), OperationType.Add);
+			}
 
-		public static Operation operator -(Operation a, Operation b) => new Operation(a, b, a.result - b.result, 1d, -1d, OperationType.Subtract);
+			return new Operation(a, b, a.result + b.result, 1d, 1d, OperationType.Add);
+		}
 
-		public static Operation operator -(Operation a, dynamic b) => new Operation(a, b, a.result - b, 1d, -1d, OperationType.Subtract);
+		public static Operation operator +(Operation a, Variable b)
+		{
+			bool aIsMatrix = a.resultType == typeof(Matrix);
+			bool bIsMatrix = b.type == typeof(Matrix);
 
-		public static Operation operator *(Operation a, Operation b) => new Operation(a, b, a.result * b.result, b.result, a.result, OperationType.Multiply);
+			if (aIsMatrix && bIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result + b.value, new Matrix(row, col, 1d), new Matrix(row, col, 1d), OperationType.Add);
+			}
+			else if (aIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result + b.value, new Matrix(row, col, 1d), row * col, OperationType.Add);
+			}
+			else if (bIsMatrix)
+			{
+				Matrix B = (Matrix)b.value;
+				int row = B.rows;
+				int col = B.columns;
+				return new Operation(a, b, a.result + b.value, row * col, new Matrix(row, col, 1d), OperationType.Add);
+			}
 
-		public static Operation operator *(Operation a, dynamic b) => new Operation(a, b, a.result * b, b, a.result, OperationType.Multiply);
+			return new Operation(a, b, a.result + b.value, 1d, 1d, OperationType.Add);
+		}
+
+		public static Operation operator +(Operation a, dynamic b)
+		{
+			bool aIsMatrix = a.resultType == typeof(Matrix);
+			bool bIsMatrix = b.GetType() == typeof(Matrix);
+
+			if (aIsMatrix && bIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result + b, new Matrix(row, col, 1d), new Matrix(row, col, 1d), OperationType.Add);
+			}
+			else if (aIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result + b, new Matrix(row, col, 1d), row * col, OperationType.Add);
+			}
+			else if (bIsMatrix)
+			{
+				Matrix B = (Matrix)b;
+				int row = B.rows;
+				int col = B.columns;
+				return new Operation(a, b, a.result + b, row * col, new Matrix(row, col, 1d), OperationType.Add);
+			}
+
+			return new Operation(a, b, a.result + b, 1d, 1d, OperationType.Add);
+		}
+
+		public static Operation operator -(Operation a, Operation b)
+		{
+			bool aIsMatrix = a.resultType == typeof(Matrix);
+			bool bIsMatrix = b.resultType == typeof(Matrix);
+
+			if (aIsMatrix && bIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result - b.result, new Matrix(row, col, 1d), new Matrix(row, col, -1d), OperationType.Subtract);
+			}
+			else if (aIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result - b.result, new Matrix(row, col, 1d), -row * col, OperationType.Subtract);
+			}
+			else if (bIsMatrix)
+			{
+				Matrix B = (Matrix)b.result;
+				int row = B.rows;
+				int col = B.columns;
+				return new Operation(a, b, a.result - b.result, row * col, new Matrix(row, col, -1d), OperationType.Subtract);
+			}
+
+			return new Operation(a, b, a.result - b.result, 1d, -1d, OperationType.Subtract);
+		}
+
+		public static Operation operator -(Operation a, Variable b)
+		{
+			bool aIsMatrix = a.resultType == typeof(Matrix);
+			bool bIsMatrix = b.type == typeof(Matrix);
+
+			if (aIsMatrix && bIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result - b.value, new Matrix(row, col, 1d), new Matrix(row, col, -1d), OperationType.Subtract);
+			}
+			else if (aIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result - b.value, new Matrix(row, col, 1d), -row * col, OperationType.Subtract);
+			}
+			else if (bIsMatrix)
+			{
+				Matrix B = (Matrix)b.value;
+				int row = B.rows;
+				int col = B.columns;
+				return new Operation(a, b, a.result - b.value, row * col, new Matrix(row, col, -1d), OperationType.Subtract);
+			}
+
+			return new Operation(a, b, a.result - b.value, 1d, -1d, OperationType.Subtract);
+		}
+
+		public static Operation operator -(Operation a, dynamic b)
+		{
+			bool aIsMatrix = a.resultType == typeof(Matrix);
+			bool bIsMatrix = b.GetType() == typeof(Matrix);
+
+			if (aIsMatrix && bIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result - b, new Matrix(row, col, 1d), new Matrix(row, col, -1d), OperationType.Subtract);
+			}
+			else if (aIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result - b, new Matrix(row, col, 1d), -row * col, OperationType.Subtract);
+			}
+			else if (bIsMatrix)
+			{
+				Matrix B = (Matrix)b;
+				int row = B.rows;
+				int col = B.columns;
+				return new Operation(a, b, a.result - b, row * col, new Matrix(row, col, -1d), OperationType.Subtract);
+			}
+
+			return new Operation(a, b, a.result - b, 1d, -1d, OperationType.Subtract);
+		}
+
+		public static Operation operator *(Operation a, Operation b)
+		{
+			bool aIsMatrix = a.resultType == typeof(Matrix);
+			bool bIsMatrix = b.resultType == typeof(Matrix);
+
+			if (aIsMatrix && bIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				Matrix B = (Matrix)b.result;
+				return new Operation(a, b, a.result * b.result, B, A, OperationType.HadamardProduct);
+			}
+			else if (aIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result * b.result, new Matrix(row, col, b.result), A.Sum(), OperationType.Multiply);
+			}
+			else if (bIsMatrix)
+			{
+				Matrix B = (Matrix)b.result;
+				int row = B.rows;
+				int col = B.columns;
+				return new Operation(a, b, a.result * b.result, B.Sum(), new Matrix(row, col, a.result), OperationType.Multiply);
+			}
+
+			return new Operation(a, b, a.result * b.result, b.result, a.result, OperationType.Multiply);
+		}
+
+		public static Operation operator *(Operation a, Variable b)
+		{
+			bool aIsMatrix = a.resultType == typeof(Matrix);
+			bool bIsMatrix = b.GetType() == typeof(Matrix);
+
+			if (aIsMatrix && bIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				Matrix B = (Matrix)b.value;
+				return new Operation(a, b, a.result * b.value, B, A, OperationType.HadamardProduct);
+			}
+			else if (aIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result * b.value, new Matrix(row, col, b.value), A.Sum(), OperationType.Multiply);
+			}
+			else if (bIsMatrix)
+			{
+				Matrix B = (Matrix)b.value;
+				int row = B.rows;
+				int col = B.columns;
+				return new Operation(a, b, a.result * b.value, B.Sum(), new Matrix(row, col, a.result), OperationType.Multiply);
+			}
+
+			return new Operation(a, b, a.result * b.value, b.value, a.result, OperationType.Multiply);
+		}
+
+		public static Operation operator *(Operation a, dynamic b)
+		{
+			bool aIsMatrix = a.resultType == typeof(Matrix);
+			bool bIsMatrix = b.GetType() == typeof(Matrix);
+
+			if (aIsMatrix && bIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				Matrix B = (Matrix)b;
+				return new Operation(a, b, a.result * b, B, A, OperationType.HadamardProduct);
+			}
+			else if (aIsMatrix)
+			{
+				Matrix A = (Matrix)a.result;
+				int row = A.rows;
+				int col = A.columns;
+				return new Operation(a, b, a.result * b, new Matrix(row, col, b), A.Sum(), OperationType.Multiply);
+			}
+			else if (bIsMatrix)
+			{
+				Matrix B = (Matrix)b;
+				int row = B.rows;
+				int col = B.columns;
+				return new Operation(a, b, a.result * b, B.Sum(), new Matrix(row, col, a.result), OperationType.Multiply);
+			}
+
+			return new Operation(a, b, a.result * b, b, a.result, OperationType.Multiply);
+		}
 
 		public static Operation operator /(Operation a, Operation b) => new Operation(a, b, a.result / b.result, 1d / b.result, -(a.result / (b.result ^ 2d)), OperationType.Divide);
 
@@ -73,6 +328,26 @@ namespace JohnFarmer.Utility
 
 		public static Operation Exp(dynamic a) => new Operation(a, null, Math.Exp(a), Math.Exp(a), null, OperationType.Exp);
 
+		public static Operation Sigmoid(Operation a)
+		{
+			if(a.resultType == typeof(Matrix))
+			{
+				Matrix A = (Matrix)a.result;
+				return new Operation(a, null, Matrix.Map(A, ActivationFunction.Sigmoid), Matrix.Map(A, ActivationFunction.SigmoidPrime), null, OperationType.Sigmoid);
+			}
+			return new Operation(a, null, ActivationFunction.Sigmoid(a), ActivationFunction.SigmoidPrime(a), null, OperationType.Sigmoid);
+		}
+		
+		public static Operation Sigmoid(Variable a)
+		{
+			if(a.type == typeof(Matrix))
+			{
+				Matrix A = (Matrix)a.value;
+				return new Operation(a, null, Matrix.Map(A, ActivationFunction.Sigmoid), Matrix.Map(A, ActivationFunction.SigmoidPrime), null, OperationType.Sigmoid);
+			}
+			return new Operation(a, null, ActivationFunction.Sigmoid(a), ActivationFunction.SigmoidPrime(a), null, OperationType.Sigmoid);
+		}
+
 		public static Operation Sigmoid(dynamic a) => new Operation(a, null, ActivationFunction.Sigmoid(a), ActivationFunction.SigmoidPrime(a), null, OperationType.Sigmoid);
 		
 		public static Operation ReLU(dynamic a) => new Operation(a, null, ActivationFunction.ReLU(a), ActivationFunction.ReLUPrime(a), null, OperationType.ReLU);
@@ -83,6 +358,28 @@ namespace JohnFarmer.Utility
 
 		public static Operation ArcTan(dynamic a) => new Operation(a, null, ActivationFunction.ArcTan(a), ActivationFunction.ArcTanPrime(a), null, OperationType.ArcTan);
 
+		public static Operation CrossEntropyLoss(Operation a, dynamic b)
+		{
+			if(a.resultType == typeof(Matrix) && b.GetType() == typeof(Matrix))
+			{
+				Matrix A = (Matrix)a.result;
+				Matrix B = (Matrix)b;
+				return new Operation(a, b, LossFunction.M_CrossEntropyLoss(A, B), ((B / A) * -1d), (Matrix.Map(A, (dynamic x) => Math.Log(x)) * -1d), OperationType.CrossEntropyLoss);
+			}
+			return new Operation(a, b, LossFunction.CrossEntropyLoss(a, b), -(b / a), -Math.Log(a), OperationType.CrossEntropyLoss);
+		}
+		
+		public static Operation CrossEntropyLoss(Variable a, dynamic b)
+		{
+			if(a.type == typeof(Matrix) && b.GetType() == typeof(Matrix))
+			{
+				Matrix A = (Matrix)a.value;
+				Matrix B = (Matrix)b;
+				return new Operation(a, b, LossFunction.M_CrossEntropyLoss(A, B), ((B / A) * -1d), (Matrix.Map(A, (dynamic x) => Math.Log(x)) * -1d), OperationType.CrossEntropyLoss);
+			}
+			return new Operation(a, b, LossFunction.CrossEntropyLoss(a, b), -(b / a), -Math.Log(a), OperationType.CrossEntropyLoss);
+		}
+
 		public static Operation CrossEntropyLoss(dynamic a, dynamic b) => new Operation(a, b, LossFunction.CrossEntropyLoss(a, b), -(b / a), -Math.Log(a), OperationType.CrossEntropyLoss);
 
 		public static Operation SquaredError(dynamic a, dynamic b) => new Operation(a, b, LossFunction.SquaredError(a, b), -2d * (b - a), 2d * (b - a), OperationType.SquaredError);
@@ -91,7 +388,19 @@ namespace JohnFarmer.Utility
 
 		public static Operation Subtract(Matrix a, Matrix b) => new Operation(a, b, a - b, new Matrix(a.rows, a.columns, 1d), new Matrix(b.rows, b.columns, -1d), OperationType.Subtract);
 
-		public static Operation Multiply(Matrix a, Matrix b) => new Operation(a, b, a * b, b, a, OperationType.Multiply);
+		public static Operation HadamardProduct(Matrix a, Matrix b) => new Operation(a, b, a * b, b, a, OperationType.HadamardProduct);
+
+		public static Operation MatMul(Operation a, Operation b) => new Operation(a, b, Matrix.MatMul(a.result, b.result), b.result.Transpose(), a.result.Transpose(), OperationType.MatrixMultiply);
+
+		public static Operation MatMul(Operation a, Variable b) => new Operation(a, b, Matrix.MatMul(a.result, b.value), b.value.Transpose(), a.result.Transpose(), OperationType.MatrixMultiply);
+
+		public static Operation MatMul(Operation a, Matrix b) => new Operation(a, b, Matrix.MatMul(a.result, b), b.Transpose(), a.result.Transpose(), OperationType.MatrixMultiply);
+		
+		public static Operation MatMul(Variable a, Variable b) => new Operation(a, b, Matrix.MatMul(a.value, b.value), b.value.Transpose(), a.value.Transpose(), OperationType.MatrixMultiply);
+		
+		public static Operation MatMul(Variable a, Operation b) => new Operation(a, b, Matrix.MatMul(a.value, b.result), b.result.Transpose(), a.value.Transpose(), OperationType.MatrixMultiply);
+		
+		public static Operation MatMul(Variable a, Matrix b) => new Operation(a, b, Matrix.MatMul(a.value, b), b.Transpose(), a.value.Transpose(), OperationType.MatrixMultiply);
 
 		/*public static Operation Divide(Matrix a, Matrix b) => new Operation(a, b, a / b, 1d / b, -(a / (b ^ 2d)), OperationType.Divide);
 
@@ -121,9 +430,16 @@ namespace JohnFarmer.Utility
 
 		public static Operation ArcTan(Matrix a) => new Operation(a, null, a.Map(ActivationFunction.ArcTan), a.Map(ActivationFunction.ArcTanPrime), null, OperationType.ArcTan);
 
-		public static Operation CrossEntropyLoss(Matrix a, Matrix b) => new Operation(a, b, LossFunction.M_CrossEntropyLoss(a, b), (b / a) * -1d, a.Map((dynamic x) => Math.Log(x)) * -1d, OperationType.CrossEntropyLoss);
-
-		public static Operation SquaredError(Matrix a, Matrix b) => new Operation(a, b, LossFunction.M_SquaredError(a, b), (b - a) * -2d, (b - a) * 2d, OperationType.SquaredError);
+		public static Operation SquaredError(Operation a, dynamic b)
+		{
+			if(a.resultType == typeof(Matrix) && b.GetType() == typeof(Matrix))
+			{
+				Matrix A = (Matrix)a.result;
+				Matrix B = (Matrix)b;
+				return new Operation(a, b, LossFunction.M_SquaredError(A, B), (B - A) * -2d, (B - A) * 2d, OperationType.SquaredError);
+			}
+			return new Operation(a, b, LossFunction.SquaredError(a, b), (b - a) * -2d, (b - a) * 2d, OperationType.SquaredError);
+		}
 
 		public override string ToString() => $"a = {a},\nb = {b},\nresult = {result},\ndyda = {dyda},\ndydb = {dydb}";
 
@@ -134,5 +450,7 @@ namespace JohnFarmer.Utility
 		public static implicit operator double(Operation operation) => (double)operation.result;
 
 		public static implicit operator long(Operation operation) => (long)operation.result;
+
+		public static implicit operator Matrix(Operation operation) => (Matrix)operation.result;
 	}
 }

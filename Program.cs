@@ -4,6 +4,7 @@ using JohnFarmer.NeuralNetwork.Matrices;
 using JohnFarmer.NeuralNetwork;
 using JohnFarmer.Utility;
 using BenchmarkDotNet.Running;
+using JohnFarmer.Mathematics;
 
 public class Program
 {
@@ -20,7 +21,26 @@ public class Program
 	private static void Main(string[] args)
 	{
 		//BenchmarkRunner.Run<BenchMark>();
-		LSTMTest();
+		//LSTMTest();
+		AutoGradTest();
+
+		/*Variable A = new(new Matrix(3, 2).Randomize(), true);
+		Variable B = new(new Matrix(2, 1).Randomize(), true);
+
+		Operation C = Operation.MatMul(A, B);
+
+		Variable D = new(new Matrix(3, 1).Randomize(), true);
+		Operation E = Operation.Add(C, D);
+
+		E.Backward();
+
+		Console.WriteLine(A.gradient);
+		Console.WriteLine(B.gradient);
+		Console.WriteLine(D.gradient);
+
+		A.Optimize(.1d);
+		B.Optimize(.1d);
+		D.Optimize(.1d);*/
 	}
 
 	private static void LSTMTest()
@@ -46,35 +66,43 @@ public class Program
 
 	private static void AutoGradTest()
 	{
-		Variable x = RandomUtil.Range(-1d, 2d);
-		Variable W1 = new(RandomUtil.Range(-1d, 2d), true);
-		Variable b1 = new(RandomUtil.Range(-1d, 2d), true);
-		Variable W2 = new(RandomUtil.Range(-1d, 2d), true);
-		Variable b2 = new(RandomUtil.Range(-1d, 2d), true);
+		Variable x = new Matrix(2, 1).Randomize();
+		Variable W1 = new(new Matrix(3, 2).Randomize(), true);
+		Variable b1 = new(new Matrix(3, 1).Randomize(), true);
+		Variable W2 = new(new Matrix(5, 3).Randomize(), true);
+		Variable b2 = new(new Matrix(5, 1).Randomize(), true);
 		double l = .1d;
-		double y_hat = 1d;
+		Matrix y_hat = new Matrix(
+			new double[,] {
+				{ 1 },
+				{ 0 },
+				{ 1 },
+				{ 0 },
+				{ 1 },
+			}
+		);
 
-		for (int i = 0; i < 1000; i++)
+		for (int i = 0; i < 500; i++)
 		{
-			Operation op_mul1 = W1 * x;
+			Operation op_mul1 = Operation.MatMul(W1, x);
 			Operation op_add1 = op_mul1 + b1;
 			Operation op_act1 = Operation.Sigmoid(op_add1);
-
-			Operation op_mul2 = W2 * op_act1;
+			
+			Operation op_mul2 = Operation.MatMul(W2, op_act1);
 			Operation op_add2 = op_mul2 + b2;
 			Operation op_act2 = Operation.Sigmoid(op_add2);
 
-			Operation op_loss = Operation.CrossEntropyLoss(op_act2, y_hat);
+			Operation op_loss = Operation.SquaredError(op_act2, y_hat);
 
 			Console.WriteLine($"=====Iteration {i + 1}======");
 			Console.WriteLine("Result: " + op_act2.result);
 			Console.WriteLine("Loss: " + op_loss.result);
 
 			op_loss.Backward();
-			W1.Optimize(l);
-			b1.Optimize(l);
 			W2.Optimize(l);
 			b2.Optimize(l);
+			W1.Optimize(l);
+			b1.Optimize(l);
 			Console.WriteLine("\n");
 		}
 	}

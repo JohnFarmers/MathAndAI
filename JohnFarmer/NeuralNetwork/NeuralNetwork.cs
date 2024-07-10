@@ -60,7 +60,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 			Matrix matrixInputs = inputs.To1DMatrix();
 			for (int i = 0; i < layerNodes.Length - 1; i++)
 			{
-				prediction = (weights[i] * (i == 0 ? matrixInputs : prediction)) + biases[i];
+				prediction = Matrix.MatMul(weights[i], (i == 0 ? matrixInputs : prediction)) + biases[i];
 				prediction.Map(activationFunction);
 			}
 			return prediction.ToArray();
@@ -79,7 +79,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 			weightedSums.Add(matrixInputs);
 			for (int i = 0; i < layerNodes.Length - 1; i++)
 			{
-				Matrix weightedSum = (weights[i] * (i == 0 ? matrixInputs : activations[i])) + biases[i];
+				Matrix weightedSum = Matrix.MatMul(weights[i], (i == 0 ? matrixInputs : activations[i])) + biases[i];
 				weightedSums.Add(weightedSum);
 				activations.Add(Matrix.Map(weightedSum, activationFunction));
 			}
@@ -87,8 +87,8 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 			Matrix dcdz = outputs - targetOutputs.To1DMatrix();
 			for (int l = layerNodes.Length - 1; l > 0; l--)
 			{
-				dcdz = l == layerNodes.Length - 1 ? dcdz : Matrix.HadamardProduct(weights[l].Transpose() * dcdz, Matrix.Map(weightedSums[l], activationFunctionDerivative));
-				weights[l - 1] -= dcdz * activations[l - 1].Transpose() * learningRate;
+				dcdz = l == layerNodes.Length - 1 ? dcdz : Matrix.MatMul(Matrix.MatMul(weights[l].Transpose(), dcdz), Matrix.Map(weightedSums[l], activationFunctionDerivative));
+				weights[l - 1] -= Matrix.MatMul(dcdz, activations[l - 1].Transpose()) * learningRate;
 				biases[l - 1] -= dcdz * learningRate;
 			}
 			double[] outputsArray = Forward(inputs).ToArray();
