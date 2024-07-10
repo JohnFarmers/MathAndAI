@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommunityToolkit.HighPerformance;
 using JohnFarmer.Mathematics;
+using JohnFarmer.Utility;
 
 namespace JohnFarmer.NeuralNetwork.Matrices
 {
 	public class NeuralNetwork
 	{
 		public readonly int[] layerNodes;
-		public List<Matrix> weights, biases;
+		public List<Variable> weights, biases;
 		public Func<dynamic, dynamic> activationFunction, activationFunctionDerivative;
 		public Func<dynamic, dynamic, dynamic> lossFunction;
 		public double learningRate, errorMaxRange, accuracy = 0;
@@ -42,12 +44,12 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 		/// <param name="biases">A parameter for when you want to specify the biases by yourself.</param>
 		public virtual void Initialize(Matrix[] weights = null, Matrix[] biases = null)
 		{
-			this.weights = new List<Matrix>();
-			this.biases = new List<Matrix>();
+			this.weights = new List<Variable>();
+			this.biases = new List<Variable>();
 			for (int i = 0; i < layerNodes.Length - 1; i++)
 			{
-				this.weights.Add(weights == null ? new Matrix(layerNodes[i + 1], layerNodes[i]).Randomize() : weights[i]);
-				this.biases.Add(biases == null ? new Matrix(layerNodes[i + 1], 1).Randomize() : biases[i]);
+				this.weights.Add(new Variable(weights == null ? new Matrix(layerNodes[i + 1], layerNodes[i]).Randomize() : weights[i], true));
+				this.biases.Add(new Variable(biases == null ? new Matrix(layerNodes[i + 1], 1).Randomize() : biases[i], true));
 			}
 		}
 
@@ -60,7 +62,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 			Matrix matrixInputs = inputs.To1DMatrix();
 			for (int i = 0; i < layerNodes.Length - 1; i++)
 			{
-				prediction = Matrix.MatMul(weights[i], (i == 0 ? matrixInputs : prediction)) + biases[i];
+				prediction = Matrix.MatMul(weights[i].value, (i == 0 ? matrixInputs : prediction)) + biases[i].value;
 				prediction.Map(activationFunction);
 			}
 			return prediction.ToArray();
@@ -71,32 +73,30 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 		/// </summary>
 		public virtual void Train(double[] inputs, double[] targetOutputs)
 		{
-			if (targetOutputs.Length != layerNodes[^1])
-				throw new Exception("The number of target outputs must match the number of the neural network outputs.");
-			List<Matrix> activations = new List<Matrix>(), weightedSums = new List<Matrix>();
 			Matrix matrixInputs = inputs.To1DMatrix();
-			activations.Add(matrixInputs);
-			weightedSums.Add(matrixInputs);
+			Operation activation = null;
 			for (int i = 0; i < layerNodes.Length - 1; i++)
 			{
-				Matrix weightedSum = Matrix.MatMul(weights[i], (i == 0 ? matrixInputs : activations[i])) + biases[i];
-				weightedSums.Add(weightedSum);
-				activations.Add(Matrix.Map(weightedSum, activationFunction));
+				Operation mul = null;
+				if (i == 0)
+					mul = Operation.MatMul(weights[i], matrixInputs);
+				else
+					mul = Operation.MatMul(weights[i], activation);
+				Operation add = mul + biases[i];
+				activation = Operation.Sigmoid(add);
 			}
-			Matrix outputs = activations[^1];
-			Matrix dcdz = outputs - targetOutputs.To1DMatrix();
-			for (int l = layerNodes.Length - 1; l > 0; l--)
-			{
-				dcdz = l == layerNodes.Length - 1 ? dcdz : Matrix.MatMul(Matrix.MatMul(weights[l].Transpose(), dcdz), Matrix.Map(weightedSums[l], activationFunctionDerivative));
-				weights[l - 1] -= Matrix.MatMul(dcdz, activations[l - 1].Transpose()) * learningRate;
-				biases[l - 1] -= dcdz * learningRate;
-			}
-			double[] outputsArray = Forward(inputs).ToArray();
-			int correctPrediction = 0;
-			for(int i = 0; i < outputsArray.Length; i++)
+			Operation loss = Operation.SquaredError(activation, targetOutputs.To1DMatrix());
+			loss.Backward();
+			Span<Variable> span = weights.AsSpan();
+			for (int i = 0; i < span.Length; i++)
+				span[i].Optimize(learningRate);
+			span = biases.AsSpan();
+			for (int i = 0; i < span.Length; i++)
+				span[i].Optimize(learningRate);
+			/*for (int i = 0; i < outputsArray.Length; i++)
 				if (Math.Abs(outputsArray[i] - targetOutputs[i]) <= errorMaxRange)
 					correctPrediction += 1;
-			accuracy = correctPrediction / targetOutputs.Length * 100;
+			accuracy = correctPrediction / targetOutputs.Length * 100;*/
 		}
 	}
 }

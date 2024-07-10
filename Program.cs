@@ -16,31 +16,15 @@ public class Program
 		{ new double[] { 1, 1 }, new double[] { 0 } },
 	};
 
-	private static readonly NeuralNetwork nn = new NeuralNetwork(new int[] { 2, 3, 1 }, ActivationFunction.Sigmoid, ActivationFunction.SigmoidPrime, LossFunction.CrossEntropyLoss, .1, .1);
+	private static readonly NeuralNetwork nn = new NeuralNetwork(new int[] { 2, 3, 1 }, ActivationFunction.Sigmoid, ActivationFunction.SigmoidPrime, LossFunction.CrossEntropyLoss, .5d);
 	
 	private static void Main(string[] args)
 	{
 		//BenchmarkRunner.Run<BenchMark>();
 		//LSTMTest();
-		AutoGradTest();
+		//AutoGradTest();
 
-		/*Variable A = new(new Matrix(3, 2).Randomize(), true);
-		Variable B = new(new Matrix(2, 1).Randomize(), true);
-
-		Operation C = Operation.MatMul(A, B);
-
-		Variable D = new(new Matrix(3, 1).Randomize(), true);
-		Operation E = Operation.Add(C, D);
-
-		E.Backward();
-
-		Console.WriteLine(A.gradient);
-		Console.WriteLine(B.gradient);
-		Console.WriteLine(D.gradient);
-
-		A.Optimize(.1d);
-		B.Optimize(.1d);
-		D.Optimize(.1d);*/
+		TestNN();
 	}
 
 	private static void LSTMTest()
@@ -152,7 +136,7 @@ public class Program
 		Console.WriteLine("This is a picture of " + answers[maxIndex]);
 	}*/
 
-	public void TestNN()
+	public static void TestNN()
 	{
 		Console.WriteLine("Pre-train:");
 		foreach (double[] input in trainingDatas.Keys)
@@ -164,7 +148,7 @@ public class Program
 		}
 		Console.WriteLine("\nPost-train:");
 		DateTime start = DateTime.Now;
-		for (int i = 0; i < 2000; i++)
+		for (int i = 0; i < 1000; i++)
 		{
 			foreach (double[] input in trainingDatas.Keys)
 				nn.Train(input, trainingDatas[input]);
@@ -178,7 +162,6 @@ public class Program
 			Console.WriteLine(input + ": " + outputs.Remove(outputs.Length - 1) + "]");
 		}
 		TimeSpan elasped = end - start;
-		Console.WriteLine("\nAccuracy: " + nn.accuracy + "%");
 		Console.WriteLine("Elasped training time: " + elasped.TotalMilliseconds + " ms");
 	}
 }
