@@ -5,6 +5,7 @@ using JohnFarmer.NeuralNetwork;
 using JohnFarmer.Utility;
 using BenchmarkDotNet.Running;
 using JohnFarmer.Mathematics;
+using MathAndAI.JohnFarmer.Utility;
 
 public class Program
 {
@@ -23,8 +24,70 @@ public class Program
 		//BenchmarkRunner.Run<BenchMark>();
 		//LSTMTest();
 		//AutoGradTest();
+		//TestNN();
 
-		TestNN();
+		W2VTest();
+	}
+
+	public static void W2VTest()
+	{
+		Word2Vec w2v = new Word2Vec(
+			new string[] {
+				"Apple is fruit",
+				"Orange is fruit",
+				"Banana is fruit",
+				"Mango is fruit",
+				"Fruit is good for your health",
+				"Apple is one type of fruit",
+				"Orange is a type of fruit",
+				"Mango is one type of fruit",
+				"Banana is a type of fruit",
+				"Apple is one kind of fruit",
+				"Orange is one kind of fruit",
+				"Mango is a kind of fruit",
+				"Banana is one kind of fruit",
+				"Your health will get better if you eat many type of fruit",
+				"Your health will get better if you eat many kind of fruit",
+				"Better eat more fruit",
+				"Many type of fruit are good",
+				"Fruit are not vegetable",
+				"Fruit is a food",
+				"Fruit is one kind of food",
+				"Human needs to eat food to survive",
+				"Human needs to eat many food to survive",
+				"Human needs to eat fruit for better health",
+				"Vegetable also make human healthy",
+				"Vegetable is a healthy food",
+				"Vegetable is also a healthy food",
+				"Fruit is a healthy food",
+				"Fruit is also a healthy food",
+			},
+			2
+		);
+
+		for (int i = 0; i < 10000; i++)
+		{
+			w2v.Train();
+			Console.WriteLine(w2v.weights1.ToString());
+		}
+
+		w2v.ShowPlot();
+	}
+
+	public static double[] SoftMax(double[] inputs)
+	{
+		int length = inputs.Length;
+		double sum = 0d;
+
+		for (int i = 0; i < length; i++)
+			sum += Math.Exp(inputs[i]);
+
+		double[] results = new double[length];
+
+		for (int i = 0; i < length; i++)
+			results[i] = Math.Exp(inputs[i]) / sum;
+
+		return results;
 	}
 
 	private static void LSTMTest()

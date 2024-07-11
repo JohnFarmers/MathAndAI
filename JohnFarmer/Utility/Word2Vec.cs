@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using JohnFarmer.Utility;
+using Plotly.NET;
 
 namespace MathAndAI.JohnFarmer.Utility
 {
@@ -15,13 +16,17 @@ namespace MathAndAI.JohnFarmer.Utility
 		public string[] corpus, tokens;
 		public Variable weights1;
 		public Variable weights2;
+		private int contextWindow;
 
-		public Word2Vec(string[] corpus, int dimension)
+		public Word2Vec(string[] corpus, int dimension, int contextWindow = 2)
 		{
 			this.corpus = corpus;
-			tokens = Tokenizer.Tokenize(corpus).ToArray();
-			weights1 = new(new Matrix(dimension, tokens.Length).Randomize(), true);
-			weights2 = new(new Matrix(tokens.Length, dimension).Randomize(), true);
+			List<string> tokens = Tokenizer.Tokenize(corpus).ToArray().ToList();
+			tokens.Add("<EOS>");
+			this.tokens = tokens.ToArray();
+			weights1 = new Variable(new Matrix(dimension, this.tokens.Length).Randomize(), true);
+			weights2 = new Variable(new Matrix(this.tokens.Length, dimension).Randomize(), true);
+			this.contextWindow = contextWindow;
 		}
 
 		public double[] Forward(string word)
@@ -31,36 +36,69 @@ namespace MathAndAI.JohnFarmer.Utility
 				int index = Array.IndexOf(tokens, word);
 				double[] inputs = new double[tokens.Length];
 				inputs[index] = 1;
-				return ((Matrix)(weights2 * (weights1 * inputs.To1DMatrix()).result)).ToArray();
+				return ((Matrix)(Matrix.MatMul(weights2.value, Matrix.MatMul(weights1.value, inputs.To1DMatrix())))).ToArray();
 			}
 			return null;
 		}
 
 		public void Train()
 		{
+			for (int i = 0; i < corpus.Length; i++)
+			{
+				ReadOnlySpan<string> wordTokens = Tokenizer.Tokenize(corpus[i]);
+				for (int j = 0; j < wordTokens.Length; j++)
+				{
+					double[] inputs = new double[tokens.Length];
+					double[] outputs = new double[tokens.Length];
+
+					string inputToken = wordTokens[j];
+					int inputIndex = Array.IndexOf(tokens, inputToken);
+					if (inputIndex == -1)
+						continue;
+					inputs[inputIndex] = 1d;
+
+					string targetToken = j + 1 < wordTokens.Length ? wordTokens[j + 1] : "<EOS>";
+					int outputIndex = Array.IndexOf(tokens, targetToken);
+					if (outputIndex == -1) 
+						continue;
+					outputs[outputIndex] = 1d;
+
+					Operation op1 = Operation.MatMul(weights1, inputs.To1DMatrix());
+					Operation op2 = Operation.MatMul(weights2, op1);
+					Operation loss = Operation.CrossEntropyLoss(op2, outputs.To1DMatrix());
+					loss.Backward();
+					weights1.Optimize(.1d);
+					weights2.Optimize(.1d);
+				}
+			}
+		}
+
+		public void ShowPlot()
+		{
+			List<double> x = new List<double>();
+			List<double> y = new List<double>();
+
+			for (int i = 0; i <weights1.value.columns; i++)
+			{
+				x.Add(weights1.value[0, i]);
+				y.Add(weights1.value[1, i]);
+			}
+
+			var scatter = Chart2D.Chart.Point<double, double, string>(new double[] { }, new double[] { }, null);
+
 			for (int i = 0; i < tokens.Length; i++)
 			{
-				double[] inputs = new double[tokens.Length];
-				double[] outputs = new double[tokens.Length];
-				string token = tokens[i];
-				int index = Array.IndexOf(tokens, token);
-				inputs[index] = 1d;
-				for (int j = 0; j < tokens.Length; j++)
+				scatter.WithAnnotations(new Plotly.NET.LayoutObjects.Annotation[]
 				{
-					if (j == index)
-					{
-						outputs[j] = 0;
-						continue;
-					}
-					outputs[j] = 1;
-				}
-				Operation op1 = Operation.MatMul(weights1, inputs.To1DMatrix());
-				Operation op2 = Operation.Multiply(weights2, op1);
-				Operation loss = Operation.CrossEntropyLoss(op2, outputs.To1DMatrix());
-				loss.Backward();
-				weights1.Optimize(.1d);
-				weights2.Optimize(.1d);
+				Plotly.NET.LayoutObjects.Annotation.init<double, double, string, string, string, string, string, string, string, string>(
+					X: x[i],
+					Y: y[i],
+					Text: tokens[i],
+					ShowArrow: false
+				)
+				});
 			}
+			scatter.Show();
 		}
 	}
 }
