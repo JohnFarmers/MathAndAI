@@ -1,11 +1,7 @@
-﻿using JohnFarmer.NeuralNetwork.Matrices;
-using JohnFarmer.NeuralNetwork;
-using JohnFarmer.Mathematics;
+﻿using JohnFarmer.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using JohnFarmer.Utility;
 using Plotly.NET;
 
@@ -90,14 +86,15 @@ namespace MathAndAI.JohnFarmer.Utility
 			{
 				scatter.WithAnnotations(new Plotly.NET.LayoutObjects.Annotation[]
 				{
-				Plotly.NET.LayoutObjects.Annotation.init<double, double, string, string, string, string, string, string, string, string>(
-					X: x[i],
-					Y: y[i],
-					Text: tokens[i],
-					ShowArrow: false
-				)
+					Plotly.NET.LayoutObjects.Annotation.init<double, double, string, string, string, string, string, string, string, string>(
+						X: x[i],
+						Y: y[i],
+						Text: tokens[i],
+						ShowArrow: false
+					)
 				});
 			}
+
 			scatter.Show();
 		}
 	}

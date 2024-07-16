@@ -22,9 +22,6 @@ public class Program
 	private static void Main(string[] args)
 	{
 		//BenchmarkRunner.Run<BenchMark>();
-		//LSTMTest();
-		//AutoGradTest();
-		//TestNN();
 
 		W2VTest();
 	}
@@ -47,7 +44,7 @@ public class Program
 				"Mango is a kind of fruit",
 				"Banana is one kind of fruit",
 				"Your health will get better if you eat many type of fruit",
-				"Your health will get better if you eat many kind of fruit",
+				"Your health will get better if you eat many kind of vegetable",
 				"Better eat more fruit",
 				"Many type of fruit are good",
 				"Fruit are not vegetable",
@@ -58,18 +55,42 @@ public class Program
 				"Human needs to eat fruit for better health",
 				"Vegetable also make human healthy",
 				"Vegetable is a healthy food",
+				"Vegetable is one kind of food",
+				"Vegetable is one type of food",
 				"Vegetable is also a healthy food",
 				"Fruit is a healthy food",
 				"Fruit is also a healthy food",
+				"Apple is not a type of vegetable",
+				"Orange is not a type of vegetable",
+				"Mango is not a type of vegetable",
+				"Banana is not a type of vegetable",
+				"Fruit is not a vegetable",
+				"Vegetable come from plant",
+				"Fruit come from plant",
+				"Vegetable also come from plant",
+				"Fruit also from plant",
+				"Fruit cannot eat human",
+				"Vegetable cannot eat human",
+				"Human cannot eat human",
+				"Human can eat fruit",
+				"Human can eat vegetable",
+				"Human can eat food",
+				"Human can eat many food",
 			},
 			2
 		);
 
-		for (int i = 0; i < 10000; i++)
+		DateTime start = DateTime.Now;
+
+		for (int i = 0; i < 1000; i++)
 		{
 			w2v.Train();
 			Console.WriteLine(w2v.weights1.ToString());
 		}
+
+		DateTime end = DateTime.Now;
+		TimeSpan elasped = end - start;
+		Console.WriteLine("Elasped training time: " + elasped.TotalMilliseconds + " ms");
 
 		w2v.ShowPlot();
 	}

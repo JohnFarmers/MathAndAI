@@ -77,11 +77,7 @@ namespace JohnFarmer.NeuralNetwork.Matrices
 			Operation activation = null;
 			for (int i = 0; i < layerNodes.Length - 1; i++)
 			{
-				Operation mul = null;
-				if (i == 0)
-					mul = Operation.MatMul(weights[i], matrixInputs);
-				else
-					mul = Operation.MatMul(weights[i], activation);
+				Operation mul = i == 0 ? Operation.MatMul(weights[i], matrixInputs) : Operation.MatMul(weights[i], activation);
 				Operation add = mul + biases[i];
 				activation = Operation.Sigmoid(add);
 			}
